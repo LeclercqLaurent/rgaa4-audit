@@ -1,0 +1,12 @@
+# Surcharges de services en environnement de test.
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # Le scan ne sollicite pas Node/Chromium en test : on remplace l'adapter réel
+    # par un double déterministe (une violation image-alt + un succès).
+    App\Tests\Double\FakePageScanner: ~
+
+    App\Domain\Scan\Port\PageScanner:
+        alias: App\Tests\Double\FakePageScanner

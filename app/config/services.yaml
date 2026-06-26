@@ -36,5 +36,17 @@ services:
     App\Domain\Shared\Port\IdGenerator:
         '@App\Infrastructure\Shared\Adapter\UuidV7Generator'
 
+    App\Domain\Scan\Port\ScanRepository:
+        '@App\Infrastructure\Scan\Adapter\DoctrineScanRepository'
+
+    App\Domain\Scan\Port\PageScanner:
+        '@App\Infrastructure\Scan\Adapter\ProcessPageScanner'
+
+    # Adapter de scan : commande de base configurable (frontière PHP ↔ Node).
+    App\Infrastructure\Scan\Adapter\ProcessPageScanner:
+        arguments:
+            $baseCommand: '%env(json:SCANNER_COMMAND)%'
+            $timeoutSeconds: '%env(int:SCANNER_TIMEOUT)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
