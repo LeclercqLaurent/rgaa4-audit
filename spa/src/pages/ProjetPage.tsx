@@ -63,7 +63,7 @@ export default function ProjetPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6" role="status" aria-label="Chargement du projet…">
+      <div className="mx-auto max-w-5xl space-y-6" role="status" aria-label="Chargement du projet…">
         <Skeleton className="h-4 w-32" />
         <div className="card space-y-3">
           <Skeleton className="h-7 w-1/2" />
@@ -82,7 +82,7 @@ export default function ProjetPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <Link to="/" className="inline-flex items-center gap-1 text-sm">
         <ArrowLeft size={16} aria-hidden="true" /> Tous les projets
       </Link>

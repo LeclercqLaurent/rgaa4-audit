@@ -39,7 +39,7 @@ export default function ProjetsPage() {
 
       {creation && <FormulaireCreation onCree={() => setCreation(false)} />}
 
-      {isLoading && <SkeletonTable lignes={5} colonnes={6} />}
+      {isLoading && <SkeletonTable lignes={5} colonnes={7} />}
       {isError && <p role="alert">Impossible de charger les projets.</p>}
       {projets && projets.length === 0 && <p className="text-gray-500">Aucun projet. Créez-en un avec « Nouveau projet ».</p>}
 
@@ -50,6 +50,7 @@ export default function ProjetsPage() {
             <thead>
               <tr>
                 <th scope="col">Nom</th>
+                <th scope="col">Type</th>
                 <th scope="col">Client</th>
                 <th scope="col">Cible</th>
                 <th scope="col">Pages</th>
@@ -161,6 +162,9 @@ function LigneProjet({ projet }: { projet: Projet }) {
           <input className="input" aria-label="Nom" value={nom} onChange={(e) => setNom(e.target.value)} />
         </td>
         <td>
+          <span className="inline-block whitespace-nowrap rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">{LIBELLE_TYPE[projet.type]}</span>
+        </td>
+        <td>
           <input className="input" aria-label="Client" value={client} onChange={(e) => setClient(e.target.value)} />
         </td>
         <td>
@@ -188,7 +192,9 @@ function LigneProjet({ projet }: { projet: Projet }) {
     <tr>
       <td className="font-medium">
         <Link to={`/projets/${projet.id}`}>{projet.nom}</Link>
-        <span className="ml-2 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">{LIBELLE_TYPE[projet.type]}</span>
+      </td>
+      <td>
+        <span className="inline-block whitespace-nowrap rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">{LIBELLE_TYPE[projet.type]}</span>
       </td>
       <td>{projet.client}</td>
       <td className="max-w-xs truncate text-gray-600">{projet.cible}</td>

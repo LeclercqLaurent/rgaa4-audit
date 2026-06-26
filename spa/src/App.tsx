@@ -27,7 +27,7 @@ export default function App() {
           Aller au contenu
         </a>
         <header className="bg-brand text-white shadow">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+          <div className="flex items-center justify-between px-6 py-3">
             <Link to="/" className="text-lg font-bold text-white no-underline">
               Auditor
             </Link>
@@ -38,7 +38,7 @@ export default function App() {
             )}
           </div>
         </header>
-        <main id="contenu" className="mx-auto max-w-5xl space-y-6 px-4 py-8">
+        <main id="contenu" className="space-y-6 px-6 py-8">
           {authentifie ? (
             <Routes>
               <Route path="/" element={<ProjetsPage />} />
