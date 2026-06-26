@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   Page,
+  Projet,
   Statut,
   ouvrirRapport,
   useAjouterPage,
@@ -22,6 +23,13 @@ const LIBELLES: Record<Statut, string> = {
   non_conforme: 'Non conforme',
   non_applicable: 'Non applicable',
   non_teste: 'Non testé',
+};
+
+const SCAN_BADGE: Record<string, string> = {
+  pending: 'bg-amber-100 text-amber-800',
+  running: 'bg-amber-100 text-amber-800',
+  done: 'bg-green-100 text-green-800',
+  failed: 'bg-red-100 text-red-800',
 };
 
 const LIBELLE_SCAN: Record<string, string> = {
@@ -58,34 +66,124 @@ export default function ProjetPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-1">
-        <Link to="/" className="text-sm">
-          ← Tous les projets
-        </Link>
-        <h1>{projet.nom}</h1>
-        <p className="text-gray-600">
-          {projet.client} — <a href={projet.urlReference}>{projet.urlReference}</a>
-        </p>
+    <div className="space-y-6">
+      <Link to="/" className="text-sm">
+        ← Tous les projets
+      </Link>
+      <Entete projet={projet} />
+      <TauxSection projetId={projetId} />
+      <PagesSection projetId={projetId} pages={projet.pages} />
+      <ConstatsSection projetId={projetId} />
+    </div>
+  );
+}
+
+function Entete({ projet }: { projet: Projet }) {
+  const { data: scans } = useScans(projet.id);
+  const lancer = useLancerScan(projet.id);
+  const consommer = useConsommerScans(projet.id);
+  const dernier = scans?.[0];
+
+  return (
+    <section className="card border-l-4 border-l-brand" aria-labelledby="projet-titre">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="space-y-2">
+          <h1 id="projet-titre">{projet.nom}</h1>
+          <p className="text-gray-600">{projet.client}</p>
+          <a href={projet.urlReference} className="inline-block break-all text-sm" target="_blank" rel="noopener noreferrer">
+            {projet.urlReference} ↗
+          </a>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+              {projet.pages.length} page{projet.pages.length > 1 ? 's' : ''}
+            </span>
+            {dernier && (
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${SCAN_BADGE[dernier.statut] ?? 'bg-gray-100 text-gray-700'}`}>
+                Scan : {LIBELLE_SCAN[dernier.statut] ?? dernier.statut}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex shrink-0 flex-col gap-2">
+          <div className="actions">
+            <button className="btn" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
+              Lancer un scan
+            </button>
+            <button className="btn btn-secondary" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
+              {consommer.isPending ? 'Traitement…' : 'Traiter la file'}
+            </button>
+          </div>
+          <div className="actions">
+            <button type="button" className="btn btn-sm btn-secondary" onClick={() => void ouvrirRapport(projet.id, false)}>
+              Rapport HTML
+            </button>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={() => void ouvrirRapport(projet.id, true)}>
+              Rapport PDF
+            </button>
+          </div>
+        </div>
       </div>
 
-      <PagesSection projetId={projetId} pages={projet.pages} />
-      <ScanSection projetId={projetId} />
-      <TauxSection projetId={projetId} />
-      <ConstatsSection projetId={projetId} />
+      {consommer.isSuccess && (
+        <p className="mt-3 text-sm text-gray-600" aria-live="polite">
+          {consommer.data.traites} message(s) traité(s).
+        </p>
+      )}
+      {dernier?.erreur && (
+        <p className="mt-3 text-sm text-danger" aria-live="polite">
+          Dernier scan en échec : {dernier.erreur}
+        </p>
+      )}
+    </section>
+  );
+}
 
-      <section className="space-y-3" aria-labelledby="rapport-titre">
-        <h2 id="rapport-titre">Rapport</h2>
-        <div className="actions">
-          <button type="button" className="btn" onClick={() => void ouvrirRapport(projetId, false)}>
-            Voir le rapport (HTML)
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={() => void ouvrirRapport(projetId, true)}>
-            Télécharger le PDF
-          </button>
+function TauxSection({ projetId }: { projetId: string }) {
+  const { data: taux } = useTaux(projetId);
+
+  if (!taux) {
+    return null;
+  }
+
+  const pourcentage = null === taux.global ? null : Math.round(taux.global * 1000) / 10;
+  const repartition = [
+    { valeur: taux.conformes, label: 'Conformes', couleur: 'text-success', point: 'bg-success' },
+    { valeur: taux.nonConformes, label: 'Non conformes', couleur: 'text-danger', point: 'bg-danger' },
+    { valeur: taux.nonApplicables, label: 'Non applicables', couleur: 'text-gray-500', point: 'bg-gray-400' },
+    { valeur: taux.nonTestes, label: 'Non testés', couleur: 'text-gray-500', point: 'bg-gray-300' },
+  ];
+
+  return (
+    <section className="space-y-3" aria-labelledby="taux-titre">
+      <h2 id="taux-titre">Taux de conformité</h2>
+      <div className="card">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-10">
+          <div className="shrink-0 text-center md:text-left">
+            <div className="text-5xl font-bold text-brand">{null === pourcentage ? 'Non évalué' : `${pourcentage} %`}</div>
+            <div className="mt-1 text-sm text-gray-500">Conformité (critères évaluables automatiquement)</div>
+          </div>
+          <div className="flex-1 space-y-4">
+            {null !== pourcentage && (
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200" role="presentation">
+                <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${pourcentage}%` }} />
+              </div>
+            )}
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {repartition.map((r) => (
+                <li key={r.label} className="rounded-lg border border-gray-100 bg-gray-50 p-3 text-center">
+                  <div className={`text-2xl font-bold ${r.couleur}`}>{r.valeur}</div>
+                  <div className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-gray-600">
+                    <span className={`inline-block h-2 w-2 rounded-full ${r.point}`} aria-hidden="true" />
+                    {r.label}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }
 
@@ -104,13 +202,15 @@ function PagesSection({ projetId, pages }: { projetId: string; pages: Page[] }) 
             <tr>
               <th scope="col">Titre</th>
               <th scope="col">URL</th>
-              <th scope="col">Actions</th>
+              <th scope="col" colSpan={3}>
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {pages.length === 0 ? (
               <tr>
-                <td colSpan={3} className="text-gray-500">
+                <td colSpan={5} className="text-gray-500">
                   Aucune page. Ajoutez-en une ci-dessous.
                 </td>
               </tr>
@@ -157,7 +257,7 @@ function LignePage({ projetId, page }: { projetId: string; page: Page }) {
         <td>
           <input className="input" aria-label="URL" type="url" value={url} onChange={(e) => setUrl(e.target.value)} />
         </td>
-        <td>
+        <td colSpan={3}>
           <div className="actions">
             <button type="button" className="btn btn-sm" onClick={enregistrer} disabled={modifier.isPending}>
               Enregistrer
@@ -175,24 +275,26 @@ function LignePage({ projetId, page }: { projetId: string; page: Page }) {
     <tr>
       <td className="font-medium">{page.titre}</td>
       <td className="max-w-sm truncate text-gray-600">{page.url}</td>
-      <td>
-        <div className="actions">
-          <a className="btn btn-sm btn-secondary" href={page.url} target="_blank" rel="noopener noreferrer">
-            Ouvrir
-          </a>
-          <button type="button" className="btn btn-sm btn-secondary" onClick={ouvrirEdition} aria-label={`Modifier ${page.titre}`}>
-            Modifier
-          </button>
-          <button
-            type="button"
-            className="btn btn-sm btn-danger"
-            onClick={supprimerPage}
-            disabled={supprimer.isPending}
-            aria-label={`Supprimer ${page.titre}`}
-          >
-            Supprimer
-          </button>
-        </div>
+      <td className="pr-1">
+        <a className="btn btn-sm btn-secondary w-full" href={page.url} target="_blank" rel="noopener noreferrer">
+          Ouvrir
+        </a>
+      </td>
+      <td className="px-1">
+        <button type="button" className="btn btn-sm btn-secondary w-full" onClick={ouvrirEdition} aria-label={`Modifier ${page.titre}`}>
+          Modifier
+        </button>
+      </td>
+      <td className="pl-1">
+        <button
+          type="button"
+          className="btn btn-sm btn-danger w-full"
+          onClick={supprimerPage}
+          disabled={supprimer.isPending}
+          aria-label={`Supprimer ${page.titre}`}
+        >
+          Supprimer
+        </button>
       </td>
     </tr>
   );
@@ -230,75 +332,6 @@ function FormulaireAjoutPage({ projetId }: { projetId: string }) {
         Ajouter la page
       </button>
     </form>
-  );
-}
-
-function ScanSection({ projetId }: { projetId: string }) {
-  const { data: scans } = useScans(projetId);
-  const lancer = useLancerScan(projetId);
-  const consommer = useConsommerScans(projetId);
-  const dernier = scans?.[0];
-
-  return (
-    <section className="card space-y-3" aria-labelledby="scan-titre">
-      <h2 id="scan-titre">Scan automatique</h2>
-      <div className="actions">
-        <button className="btn" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
-          Lancer un scan
-        </button>
-        <button className="btn btn-secondary" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
-          {consommer.isPending ? 'Traitement…' : 'Traiter les scans en attente'}
-        </button>
-      </div>
-      {consommer.isSuccess && (
-        <p className="text-sm text-gray-600" aria-live="polite">
-          {consommer.data.traites} message(s) traité(s).
-        </p>
-      )}
-      {dernier && (
-        <p className="text-sm text-gray-600" aria-live="polite">
-          Dernier scan : <strong>{LIBELLE_SCAN[dernier.statut] ?? dernier.statut}</strong> (
-          {new Date(dernier.dateCreation).toLocaleString('fr-FR')}){dernier.erreur && <> — {dernier.erreur}</>}
-        </p>
-      )}
-    </section>
-  );
-}
-
-function CarteStat({ valeur, label, ton }: { valeur: string | number; label: string; ton?: 'principal' | 'vert' | 'rouge' }) {
-  const base = 'flex flex-1 flex-col items-center gap-1 rounded-xl border p-4 text-center';
-  const styles =
-    'principal' === ton
-      ? 'border-brand bg-brand text-white'
-      : 'border-gray-200 bg-white';
-  const couleurValeur = 'vert' === ton ? 'text-success' : 'rouge' === ton ? 'text-danger' : '';
-
-  return (
-    <div className={`${base} ${styles} min-w-[130px]`}>
-      <span className={`text-3xl font-bold ${couleurValeur}`}>{valeur}</span>
-      <span className={`text-xs ${'principal' === ton ? 'text-white' : 'text-gray-500'}`}>{label}</span>
-    </div>
-  );
-}
-
-function TauxSection({ projetId }: { projetId: string }) {
-  const { data: taux } = useTaux(projetId);
-
-  if (!taux) {
-    return null;
-  }
-
-  return (
-    <section className="space-y-3" aria-labelledby="taux-titre">
-      <h2 id="taux-titre">Taux de conformité</h2>
-      <div className="flex flex-wrap gap-3">
-        <CarteStat valeur={null === taux.global ? 'Non évalué' : `${Math.round(taux.global * 1000) / 10} %`} label="Conformité globale" ton="principal" />
-        <CarteStat valeur={taux.conformes} label="Conformes" ton="vert" />
-        <CarteStat valeur={taux.nonConformes} label="Non conformes" ton="rouge" />
-        <CarteStat valeur={taux.nonApplicables} label="Non applicables" />
-        <CarteStat valeur={taux.nonTestes} label="Non testés" />
-      </div>
-    </section>
   );
 }
 
