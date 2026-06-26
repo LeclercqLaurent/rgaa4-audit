@@ -117,7 +117,8 @@ function ScanSection({ projetId }: { projetId: string }) {
       </button>
       {dernier && (
         <p aria-live="polite">
-          Dernier scan : <strong>{dernier.statut}</strong>
+          Dernier scan : <strong>{dernier.statut}</strong> (
+          {new Date(dernier.dateCreation).toLocaleString('fr-FR')})
           {dernier.erreur && <> — {dernier.erreur}</>}
         </p>
       )}
@@ -147,6 +148,7 @@ function TauxSection({ projetId }: { projetId: string }) {
 function ConstatsSection({ projetId }: { projetId: string }) {
   const { data: constats } = useConstats(projetId);
   const definir = useDefinirStatut(projetId);
+  const [filtre, setFiltre] = useState<Statut | 'tous'>('tous');
 
   if (!constats || constats.length === 0) {
     return (
@@ -157,9 +159,30 @@ function ConstatsSection({ projetId }: { projetId: string }) {
     );
   }
 
+  const comptes = constats.reduce<Record<string, number>>((acc, c) => {
+    acc[c.statut] = (acc[c.statut] ?? 0) + 1;
+
+    return acc;
+  }, {});
+  const affiches = constats.filter((c) => 'tous' === filtre || c.statut === filtre);
+
   return (
     <section aria-labelledby="constats-titre">
-      <h2 id="constats-titre">Constats</h2>
+      <h2 id="constats-titre">Constats ({constats.length})</h2>
+      <p>
+        {comptes['conforme'] ?? 0} conforme(s), {comptes['non_conforme'] ?? 0} non conforme(s),{' '}
+        {comptes['non_applicable'] ?? 0} non applicable(s), {comptes['non_teste'] ?? 0} non testé(s).
+      </p>
+      <div className="champ" style={{ maxWidth: 320 }}>
+        <label htmlFor="filtre-statut">Filtrer par statut</label>
+        <select id="filtre-statut" value={filtre} onChange={(e) => setFiltre(e.target.value as Statut | 'tous')}>
+          <option value="tous">Tous ({constats.length})</option>
+          <option value="non_conforme">Non conformes ({comptes['non_conforme'] ?? 0})</option>
+          <option value="conforme">Conformes ({comptes['conforme'] ?? 0})</option>
+          <option value="non_applicable">Non applicables ({comptes['non_applicable'] ?? 0})</option>
+          <option value="non_teste">Non testés ({comptes['non_teste'] ?? 0})</option>
+        </select>
+      </div>
       <table>
         <caption>Constats de conformité par critère et page</caption>
         <thead>
@@ -172,7 +195,7 @@ function ConstatsSection({ projetId }: { projetId: string }) {
           </tr>
         </thead>
         <tbody>
-          {constats.map((constat) => (
+          {affiches.map((constat) => (
             <tr key={constat.id}>
               <td>{constat.critereNumero}</td>
               <td>{constat.pageUrl}</td>
