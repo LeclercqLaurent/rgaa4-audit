@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Application\Scan\Command;
 
+use App\Application\Audit\Command\GenererConstats;
 use App\Application\Audit\Query\ObtenirProjet;
 use App\Application\Audit\Query\ObtenirProjetHandler;
 use App\Domain\Scan\Port\PageScanner;
 use App\Domain\Scan\Port\ScanRepository;
 use App\Domain\Scan\ValueObject\ResultatPage;
+use App\Domain\Scan\ValueObject\StatutScan;
 use DateTimeImmutable;
 use RuntimeException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
 /**
@@ -25,6 +28,7 @@ final readonly class LancerScanHandler
         private ScanRepository $scans,
         private ObtenirProjetHandler $obtenirProjet,
         private PageScanner $scanner,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -56,5 +60,9 @@ final readonly class LancerScanHandler
         }
 
         $this->scans->save($scan);
+
+        if (StatutScan::Termine === $scan->statut()) {
+            $this->bus->dispatch(new GenererConstats($scan->projetId()));
+        }
     }
 }

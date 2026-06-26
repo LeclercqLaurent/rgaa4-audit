@@ -16,6 +16,8 @@ framework:
         routing:
             # Un scan multi-pages est long : on l'exécute hors requête HTTP.
             App\Application\Scan\Command\LancerScan: async
+            # Génération des constats déclenchée à la fin d'un scan.
+            App\Application\Audit\Command\GenererConstats: async
 
 # En test, on exécute le scan de façon synchrone pour des scénarios déterministes
 # (le PageScanner est mocké, donc aucun Node réel n'est sollicité).

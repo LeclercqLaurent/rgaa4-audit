@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domain\Audit\Port;
+
+use App\Domain\Audit\Entity\Constat;
+
+interface ConstatRepository
+{
+    /**
+     * Remplace l'intégralité des constats automatiques d'un projet (les constats
+     * manuels de l'auditeur ne sont pas touchés).
+     *
+     * @param list<Constat> $constats
+     */
+    public function remplacerAuto(string $projetId, array $constats): void;
+
+    /**
+     * @return list<Constat>
+     */
+    public function findByProjet(string $projetId): array;
+}

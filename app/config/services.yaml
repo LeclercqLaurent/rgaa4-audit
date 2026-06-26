@@ -30,6 +30,12 @@ services:
     App\Domain\Referential\Port\ThematiqueRepository:
         '@App\Infrastructure\Referential\Adapter\DoctrineThematiqueRepository'
 
+    App\Domain\Referential\Port\MappingRgaaRepository:
+        '@App\Infrastructure\Referential\Adapter\DoctrineMappingRgaaRepository'
+
+    App\Domain\Audit\Port\ConstatRepository:
+        '@App\Infrastructure\Audit\Adapter\DoctrineConstatRepository'
+
     App\Domain\Audit\Port\ProjetRepository:
         '@App\Infrastructure\Audit\Adapter\DoctrineProjetRepository'
 

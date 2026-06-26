@@ -9,3 +9,8 @@
 
 controllers:
     resource: routing.controllers
+
+# Contrôleurs HTTP applicatifs (hors ressources API Platform).
+app_http:
+    resource: ../src/Infrastructure/Http/
+    type: attribute
