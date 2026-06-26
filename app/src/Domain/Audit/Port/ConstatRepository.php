@@ -17,6 +17,11 @@ interface ConstatRepository
     public function remplacerAuto(string $projetId, array $constats): void;
 
     /**
+     * Enregistre (ou remplace) le constat manuel d'un (projet, page, critère).
+     */
+    public function enregistrerManuel(Constat $constat): void;
+
+    /**
      * @return list<Constat>
      */
     public function findByProjet(string $projetId): array;

@@ -37,6 +37,21 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
         $this->em->flush();
     }
 
+    public function enregistrerManuel(Constat $constat): void
+    {
+        $this->em->createQuery(
+            sprintf('DELETE FROM %s c WHERE c.projetId = :projet AND c.pageUrl = :page AND c.critereNumero = :critere AND c.source = :source', ConstatEntity::class),
+        )
+            ->setParameter('projet', $constat->projetId())
+            ->setParameter('page', $constat->pageUrl())
+            ->setParameter('critere', $constat->critereNumero())
+            ->setParameter('source', SourceConstat::Manuel->value)
+            ->execute();
+
+        $this->em->persist($this->toEntity($constat));
+        $this->em->flush();
+    }
+
     public function findByProjet(string $projetId): array
     {
         $entities = $this->em->getRepository(ConstatEntity::class)->findBy(['projetId' => $projetId]);
