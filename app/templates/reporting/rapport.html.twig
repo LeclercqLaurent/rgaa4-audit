@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Rapport d'audit RGAA 4 — {{ rapport.projetNom }}</title>
+    <style>
+        body { font-family: "DejaVu Sans", sans-serif; color: #1a1a1a; font-size: 12px; line-height: 1.5; }
+        h1 { font-size: 22px; border-bottom: 3px solid #000091; padding-bottom: 6px; }
+        h2 { font-size: 16px; color: #000091; margin-top: 24px; }
+        table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
+        caption { text-align: left; font-weight: bold; margin-bottom: 4px; }
+        th, td { border: 1px solid #999; padding: 5px 7px; text-align: left; vertical-align: top; }
+        th { background: #f0f0f5; }
+        .taux { font-size: 28px; font-weight: bold; color: #000091; }
+        .meta td:first-child { font-weight: bold; width: 30%; }
+        .s-conforme { color: #18753c; font-weight: bold; }
+        .s-non_conforme { color: #ce0500; font-weight: bold; }
+        .s-non_applicable, .s-non_teste { color: #666; }
+        .preuve { font-family: monospace; font-size: 11px; color: #444; }
+    </style>
+</head>
+<body>
+    {% set libelles = {'conforme': 'Conforme', 'non_conforme': 'Non conforme', 'non_applicable': 'Non applicable', 'non_teste': 'Non testé'} %}
+    {% set global = rapport.taux.global %}
+
+    <h1>Rapport d'audit d'accessibilité RGAA 4</h1>
+
+    <table class="meta">
+        <caption>Informations sur l'audit</caption>
+        <tbody>
+            <tr><td>Projet</td><td>{{ rapport.projetNom }}</td></tr>
+            <tr><td>Client</td><td>{{ rapport.client }}</td></tr>
+            <tr><td>URL de référence</td><td>{{ rapport.urlReference }}</td></tr>
+            <tr><td>Date de génération</td><td>{{ rapport.dateGeneration }}</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Déclaration d'accessibilité</h2>
+    <p>
+        Au regard des critères automatiquement évalués, le site est
+        {% if global >= 1 %}<strong>totalement conforme</strong>
+        {% elseif global > 0 %}<strong>partiellement conforme</strong>
+        {% else %}<strong>non conforme</strong>{% endif %}
+        au RGAA 4.
+    </p>
+    <p class="taux">Taux de conformité : {{ (global * 100)|round(1) }} %</p>
+    <p>
+        {{ rapport.taux.conformes }} critère(s) conforme(s), {{ rapport.taux.nonConformes }} non conforme(s),
+        {{ rapport.taux.nonApplicables }} non applicable(s), {{ rapport.taux.nonTestes }} non testé(s).
+    </p>
+
+    {% if rapport.taux.parThematique is not empty %}
+    <table>
+        <caption>Taux de conformité par thématique</caption>
+        <thead><tr><th scope="col">Thématique</th><th scope="col">Taux</th></tr></thead>
+        <tbody>
+            {% for numero, taux in rapport.taux.parThematique %}
+            <tr><td>Thématique {{ numero }}</td><td>{{ (taux * 100)|round(1) }} %</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2>Détail des constats</h2>
+    {% for section in rapport.sections %}
+    <h3>{{ section.numero }}. {{ section.nom }}{% if section.taux is not null %} — {{ (section.taux * 100)|round(1) }} %{% endif %}</h3>
+    <table>
+        <caption>Constats de la thématique {{ section.nom }}</caption>
+        <thead>
+            <tr><th scope="col">Critère</th><th scope="col">Intitulé</th><th scope="col">Statut</th><th scope="col">Source</th></tr>
+        </thead>
+        <tbody>
+            {% for ligne in section.lignes %}
+            <tr>
+                <td>{{ ligne.critereNumero }}</td>
+                <td>{{ ligne.intitule }}</td>
+                <td class="s-{{ ligne.statut.value }}">{{ libelles[ligne.statut.value] }}</td>
+                <td>{{ ligne.source.value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucun constat enregistré pour ce projet.</p>
+    {% endfor %}
+
+    <h2>Plan d'action</h2>
+    {% set plan = rapport.planAction %}
+    {% if plan is empty %}
+    <p>Aucune non-conformité automatique relevée.</p>
+    {% else %}
+    <table>
+        <caption>Non-conformités à corriger</caption>
+        <thead>
+            <tr><th scope="col">Critère</th><th scope="col">Page</th><th scope="col">Preuves</th></tr>
+        </thead>
+        <tbody>
+            {% for ligne in plan %}
+            <tr>
+                <td>{{ ligne.critereNumero }}<br><span class="preuve">{{ ligne.intitule }}</span></td>
+                <td class="preuve">{{ ligne.pageUrl }}</td>
+                <td>
+                    {% for preuve in ligne.preuves %}
+                    <div class="preuve">{{ preuve.regle }}{% if preuve.cible %} — <code>{{ preuve.cible }}</code>{% endif %}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</body>
+</html>

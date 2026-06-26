@@ -36,6 +36,9 @@ services:
     App\Domain\Audit\Port\ConstatRepository:
         '@App\Infrastructure\Audit\Adapter\DoctrineConstatRepository'
 
+    App\Domain\Reporting\Port\RapportRenderer:
+        '@App\Infrastructure\Reporting\Adapter\RapportRendererTwigDompdf'
+
     App\Domain\Audit\Port\ProjetRepository:
         '@App\Infrastructure\Audit\Adapter\DoctrineProjetRepository'
 
