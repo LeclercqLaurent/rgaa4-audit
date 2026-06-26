@@ -54,14 +54,15 @@ services:
     networks:
       - rgaa
 
-  # SPA React + TypeScript (Vite). Dev : `docker compose exec spa npm run dev`.
+  # SPA React + TypeScript (Vite). Démarre le serveur de dev automatiquement
+  # (installe les deps au premier lancement si node_modules est absent).
   spa:
     image: node:24
     container_name: spa_rgaa
     working_dir: /spa
     volumes:
       - ./spa:/spa
-    command: ["sleep", "infinity"]
+    command: ["sh", "-lc", "[ -d node_modules ] || npm install --no-audit --no-fund; npm run dev"]
     ports:
       - "5173:5173"
     networks:
