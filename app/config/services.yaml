@@ -60,5 +60,14 @@ services:
             $baseCommand: '%env(json:SCANNER_COMMAND)%'
             $timeoutSeconds: '%env(int:SCANNER_TIMEOUT)%'
 
+    # 2ᵉ moteur (Phase B) : analyse de complexité PHP via phpx-complexity.
+    App\Domain\Scan\Port\AnalyseurCode:
+        '@App\Infrastructure\Scan\Adapter\ProcessComplexityAnalyzer'
+
+    App\Infrastructure\Scan\Adapter\ProcessComplexityAnalyzer:
+        arguments:
+            $baseCommand: '%env(json:COMPLEXITY_COMMAND)%'
+            $timeoutSeconds: '%env(int:COMPLEXITY_TIMEOUT)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
