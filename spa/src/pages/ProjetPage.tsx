@@ -58,62 +58,68 @@ export default function ProjetPage() {
   }
 
   return (
-    <>
-      <p>
-        <Link to="/">← Tous les projets</Link>
-      </p>
-      <h1>{projet.nom}</h1>
-      <p>
-        {projet.client} — <a href={projet.urlReference}>{projet.urlReference}</a>
-      </p>
+    <div className="space-y-8">
+      <div className="space-y-1">
+        <Link to="/" className="text-sm">
+          ← Tous les projets
+        </Link>
+        <h1>{projet.nom}</h1>
+        <p className="text-gray-600">
+          {projet.client} — <a href={projet.urlReference}>{projet.urlReference}</a>
+        </p>
+      </div>
 
       <PagesSection projetId={projetId} pages={projet.pages} />
       <ScanSection projetId={projetId} />
       <TauxSection projetId={projetId} />
       <ConstatsSection projetId={projetId} />
 
-      <section aria-labelledby="rapport-titre">
+      <section className="space-y-3" aria-labelledby="rapport-titre">
         <h2 id="rapport-titre">Rapport</h2>
         <div className="actions">
-          <button type="button" className="bouton" onClick={() => void ouvrirRapport(projetId, false)}>
+          <button type="button" className="btn" onClick={() => void ouvrirRapport(projetId, false)}>
             Voir le rapport (HTML)
           </button>
-          <button type="button" className="bouton" onClick={() => void ouvrirRapport(projetId, true)}>
+          <button type="button" className="btn btn-secondary" onClick={() => void ouvrirRapport(projetId, true)}>
             Télécharger le PDF
           </button>
         </div>
       </section>
-    </>
+    </div>
   );
 }
 
 function PagesSection({ projetId, pages }: { projetId: string; pages: Page[] }) {
   return (
-    <section aria-labelledby="pages-titre">
+    <section className="space-y-3" aria-labelledby="pages-titre">
       <h2 id="pages-titre">Pages à auditer (échantillon)</h2>
-      <p className="aide">
+      <p className="text-sm text-gray-500">
         Les pages représentatives du site qui seront analysées au lancement du scan. En RGAA, l'audit porte sur un
         échantillon de pages, pas sur le site entier.
       </p>
-      <table>
-        <caption className="visuellement-cache">Pages de l'échantillon</caption>
-        <thead>
-          <tr>
-            <th scope="col">Titre</th>
-            <th scope="col">URL</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pages.length === 0 ? (
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <table className="table">
+          <caption className="sr-only">Pages de l'échantillon</caption>
+          <thead>
             <tr>
-              <td colSpan={3}>Aucune page. Ajoutez-en une ci-dessous.</td>
+              <th scope="col">Titre</th>
+              <th scope="col">URL</th>
+              <th scope="col">Actions</th>
             </tr>
-          ) : (
-            pages.map((page) => <LignePage key={page.id} projetId={projetId} page={page} />)
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {pages.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="text-gray-500">
+                  Aucune page. Ajoutez-en une ci-dessous.
+                </td>
+              </tr>
+            ) : (
+              pages.map((page) => <LignePage key={page.id} projetId={projetId} page={page} />)
+            )}
+          </tbody>
+        </table>
+      </div>
       <FormulaireAjoutPage projetId={projetId} />
     </section>
   );
@@ -145,18 +151,18 @@ function LignePage({ projetId, page }: { projetId: string; page: Page }) {
   if (edition) {
     return (
       <tr>
-        <td className="cellule-edition">
-          <input aria-label="Titre" value={titre} onChange={(e) => setTitre(e.target.value)} />
+        <td>
+          <input className="input" aria-label="Titre" value={titre} onChange={(e) => setTitre(e.target.value)} />
         </td>
-        <td className="cellule-edition">
-          <input aria-label="URL" type="url" value={url} onChange={(e) => setUrl(e.target.value)} />
+        <td>
+          <input className="input" aria-label="URL" type="url" value={url} onChange={(e) => setUrl(e.target.value)} />
         </td>
         <td>
           <div className="actions">
-            <button type="button" className="bouton bouton--petit" onClick={enregistrer} disabled={modifier.isPending}>
+            <button type="button" className="btn btn-sm" onClick={enregistrer} disabled={modifier.isPending}>
               Enregistrer
             </button>
-            <button type="button" className="bouton bouton--petit" onClick={() => setEdition(false)}>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={() => setEdition(false)}>
               Annuler
             </button>
           </div>
@@ -167,19 +173,19 @@ function LignePage({ projetId, page }: { projetId: string; page: Page }) {
 
   return (
     <tr>
-      <td>{page.titre}</td>
-      <td>{page.url}</td>
+      <td className="font-medium">{page.titre}</td>
+      <td className="max-w-sm truncate text-gray-600">{page.url}</td>
       <td>
         <div className="actions">
-          <a className="bouton bouton--petit" href={page.url} target="_blank" rel="noopener noreferrer">
+          <a className="btn btn-sm btn-secondary" href={page.url} target="_blank" rel="noopener noreferrer">
             Ouvrir
           </a>
-          <button type="button" className="bouton bouton--petit" onClick={ouvrirEdition} aria-label={`Modifier ${page.titre}`}>
+          <button type="button" className="btn btn-sm btn-secondary" onClick={ouvrirEdition} aria-label={`Modifier ${page.titre}`}>
             Modifier
           </button>
           <button
             type="button"
-            className="bouton bouton--petit bouton--danger"
+            className="btn btn-sm btn-danger"
             onClick={supprimerPage}
             disabled={supprimer.isPending}
             aria-label={`Supprimer ${page.titre}`}
@@ -211,20 +217,18 @@ function FormulaireAjoutPage({ projetId }: { projetId: string }) {
   };
 
   return (
-    <form onSubmit={soumettre} className="grille grille--2">
-      <div className="champ">
+    <form onSubmit={soumettre} className="grid grid-cols-1 items-end gap-4 lg:grid-cols-3">
+      <div className="field">
         <label htmlFor="page-titre">Titre de la page</label>
         <input id="page-titre" required value={titre} onChange={(e) => setTitre(e.target.value)} />
       </div>
-      <div className="champ">
+      <div className="field">
         <label htmlFor="page-url">URL de la page</label>
         <input id="page-url" type="url" required placeholder="https://exemple.fr/contact" value={url} onChange={(e) => setUrl(e.target.value)} />
       </div>
-      <div className="champ" style={{ alignSelf: 'end' }}>
-        <button className="bouton" type="submit" disabled={ajouter.isPending}>
-          Ajouter la page
-        </button>
-      </div>
+      <button className="btn" type="submit" disabled={ajouter.isPending}>
+        Ajouter la page
+      </button>
     </form>
   );
 }
@@ -236,24 +240,44 @@ function ScanSection({ projetId }: { projetId: string }) {
   const dernier = scans?.[0];
 
   return (
-    <section className="carte" aria-labelledby="scan-titre">
+    <section className="card space-y-3" aria-labelledby="scan-titre">
       <h2 id="scan-titre">Scan automatique</h2>
       <div className="actions">
-        <button className="bouton" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
+        <button className="btn" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
           Lancer un scan
         </button>
-        <button className="bouton" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
+        <button className="btn btn-secondary" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
           {consommer.isPending ? 'Traitement…' : 'Traiter les scans en attente'}
         </button>
       </div>
-      {consommer.isSuccess && <p aria-live="polite">{consommer.data.traites} message(s) traité(s).</p>}
+      {consommer.isSuccess && (
+        <p className="text-sm text-gray-600" aria-live="polite">
+          {consommer.data.traites} message(s) traité(s).
+        </p>
+      )}
       {dernier && (
-        <p aria-live="polite">
+        <p className="text-sm text-gray-600" aria-live="polite">
           Dernier scan : <strong>{LIBELLE_SCAN[dernier.statut] ?? dernier.statut}</strong> (
           {new Date(dernier.dateCreation).toLocaleString('fr-FR')}){dernier.erreur && <> — {dernier.erreur}</>}
         </p>
       )}
     </section>
+  );
+}
+
+function CarteStat({ valeur, label, ton }: { valeur: string | number; label: string; ton?: 'principal' | 'vert' | 'rouge' }) {
+  const base = 'flex flex-1 flex-col items-center gap-1 rounded-xl border p-4 text-center';
+  const styles =
+    'principal' === ton
+      ? 'border-brand bg-brand text-white'
+      : 'border-gray-200 bg-white';
+  const couleurValeur = 'vert' === ton ? 'text-success' : 'rouge' === ton ? 'text-danger' : '';
+
+  return (
+    <div className={`${base} ${styles} min-w-[130px]`}>
+      <span className={`text-3xl font-bold ${couleurValeur}`}>{valeur}</span>
+      <span className={`text-xs ${'principal' === ton ? 'text-white' : 'text-gray-500'}`}>{label}</span>
+    </div>
   );
 }
 
@@ -265,29 +289,14 @@ function TauxSection({ projetId }: { projetId: string }) {
   }
 
   return (
-    <section aria-labelledby="taux-titre">
+    <section className="space-y-3" aria-labelledby="taux-titre">
       <h2 id="taux-titre">Taux de conformité</h2>
-      <div className="cards">
-        <div className="card card--principal">
-          <span className="card__valeur">{null === taux.global ? 'Non évalué' : `${Math.round(taux.global * 1000) / 10} %`}</span>
-          <span className="card__label">Conformité globale</span>
-        </div>
-        <div className="card">
-          <span className="card__valeur statut--conforme">{taux.conformes}</span>
-          <span className="card__label">Conformes</span>
-        </div>
-        <div className="card">
-          <span className="card__valeur statut--non_conforme">{taux.nonConformes}</span>
-          <span className="card__label">Non conformes</span>
-        </div>
-        <div className="card">
-          <span className="card__valeur">{taux.nonApplicables}</span>
-          <span className="card__label">Non applicables</span>
-        </div>
-        <div className="card">
-          <span className="card__valeur">{taux.nonTestes}</span>
-          <span className="card__label">Non testés</span>
-        </div>
+      <div className="flex flex-wrap gap-3">
+        <CarteStat valeur={null === taux.global ? 'Non évalué' : `${Math.round(taux.global * 1000) / 10} %`} label="Conformité globale" ton="principal" />
+        <CarteStat valeur={taux.conformes} label="Conformes" ton="vert" />
+        <CarteStat valeur={taux.nonConformes} label="Non conformes" ton="rouge" />
+        <CarteStat valeur={taux.nonApplicables} label="Non applicables" />
+        <CarteStat valeur={taux.nonTestes} label="Non testés" />
       </div>
     </section>
   );
@@ -300,9 +309,9 @@ function ConstatsSection({ projetId }: { projetId: string }) {
 
   if (!constats || constats.length === 0) {
     return (
-      <section aria-labelledby="constats-titre">
+      <section className="space-y-3" aria-labelledby="constats-titre">
         <h2 id="constats-titre">Constats</h2>
-        <p>Aucun constat. Lancez un scan pour les générer.</p>
+        <p className="text-gray-500">Aucun constat. Lancez un scan pour les générer.</p>
       </section>
     );
   }
@@ -315,9 +324,9 @@ function ConstatsSection({ projetId }: { projetId: string }) {
   const affiches = constats.filter((c) => 'tous' === filtre || c.statut === filtre);
 
   return (
-    <section aria-labelledby="constats-titre">
+    <section className="space-y-3" aria-labelledby="constats-titre">
       <h2 id="constats-titre">Constats ({constats.length})</h2>
-      <div className="champ" style={{ maxWidth: 320 }}>
+      <div className="field max-w-xs">
         <label htmlFor="filtre-statut">Filtrer par statut</label>
         <select id="filtre-statut" value={filtre} onChange={(e) => setFiltre(e.target.value as Statut | 'tous')}>
           <option value="tous">Tous ({constats.length})</option>
@@ -327,50 +336,55 @@ function ConstatsSection({ projetId }: { projetId: string }) {
           <option value="non_teste">Non testés ({comptes['non_teste'] ?? 0})</option>
         </select>
       </div>
-      <table>
-        <caption className="visuellement-cache">Constats de conformité par critère et page</caption>
-        <thead>
-          <tr>
-            <th scope="col">Critère</th>
-            <th scope="col">Page</th>
-            <th scope="col">Statut</th>
-            <th scope="col">Source</th>
-            <th scope="col">Statuer</th>
-          </tr>
-        </thead>
-        <tbody>
-          {affiches.map((constat) => (
-            <tr key={constat.id}>
-              <td>{constat.critereNumero}</td>
-              <td>{constat.pageUrl}</td>
-              <td className={`statut--${constat.statut}`}>{LIBELLES[constat.statut]}</td>
-              <td>{constat.source}</td>
-              <td>
-                <label className="visuellement-cache" htmlFor={`statut-${constat.id}`}>
-                  Statut du critère {constat.critereNumero} pour {constat.pageUrl}
-                </label>
-                <select
-                  id={`statut-${constat.id}`}
-                  value={constat.statut}
-                  onChange={(e) =>
-                    definir.mutate({
-                      pageUrl: constat.pageUrl,
-                      critereNumero: constat.critereNumero,
-                      statut: e.target.value as Statut,
-                    })
-                  }
-                >
-                  {(Object.keys(LIBELLES) as Statut[]).map((statut) => (
-                    <option key={statut} value={statut}>
-                      {LIBELLES[statut]}
-                    </option>
-                  ))}
-                </select>
-              </td>
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <table className="table">
+          <caption className="sr-only">Constats de conformité par critère et page</caption>
+          <thead>
+            <tr>
+              <th scope="col">Critère</th>
+              <th scope="col">Page</th>
+              <th scope="col">Statut</th>
+              <th scope="col">Source</th>
+              <th scope="col">Statuer</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {affiches.map((constat) => (
+              <tr key={constat.id}>
+                <td className="font-medium">{constat.critereNumero}</td>
+                <td className="max-w-xs truncate text-gray-600">{constat.pageUrl}</td>
+                <td>
+                  <span className={`badge badge-${constat.statut}`}>{LIBELLES[constat.statut]}</span>
+                </td>
+                <td className="text-gray-600">{constat.source}</td>
+                <td>
+                  <label className="sr-only" htmlFor={`statut-${constat.id}`}>
+                    Statut du critère {constat.critereNumero} pour {constat.pageUrl}
+                  </label>
+                  <select
+                    id={`statut-${constat.id}`}
+                    className="input"
+                    value={constat.statut}
+                    onChange={(e) =>
+                      definir.mutate({
+                        pageUrl: constat.pageUrl,
+                        critereNumero: constat.critereNumero,
+                        statut: e.target.value as Statut,
+                      })
+                    }
+                  >
+                    {(Object.keys(LIBELLES) as Statut[]).map((statut) => (
+                      <option key={statut} value={statut}>
+                        {LIBELLES[statut]}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

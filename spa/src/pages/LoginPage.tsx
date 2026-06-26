@@ -22,14 +22,14 @@ export default function LoginPage({ onConnecte }: { onConnecte: () => void }) {
   };
 
   return (
-    <section className="carte" aria-labelledby="login-titre" style={{ maxWidth: 420, margin: '48px auto' }}>
+    <section className="card mx-auto mt-12 max-w-md space-y-4" aria-labelledby="login-titre">
       <h1 id="login-titre">Connexion</h1>
-      <form onSubmit={soumettre}>
-        <div className="champ">
+      <form onSubmit={soumettre} className="space-y-4">
+        <div className="field">
           <label htmlFor="email">Adresse e-mail</label>
           <input id="email" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
-        <div className="champ">
+        <div className="field">
           <label htmlFor="mdp">Mot de passe</label>
           <input
             id="mdp"
@@ -41,11 +41,11 @@ export default function LoginPage({ onConnecte }: { onConnecte: () => void }) {
           />
         </div>
         {erreur && (
-          <p role="alert" className="statut--non_conforme">
+          <p role="alert" className="text-sm font-medium text-danger">
             {erreur}
           </p>
         )}
-        <button className="bouton" type="submit" disabled={enCours}>
+        <button className="btn w-full" type="submit" disabled={enCours}>
           {enCours ? 'Connexion…' : 'Se connecter'}
         </button>
       </form>

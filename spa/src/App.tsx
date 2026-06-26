@@ -25,17 +25,19 @@ export default function App() {
         <a className="skip-link" href="#contenu">
           Aller au contenu
         </a>
-        <header className="entete">
-          <Link to="/" className="entete__logo">
-            Audit RGAA 4
-          </Link>
-          {authentifie && (
-            <button type="button" className="entete__deconnexion" onClick={deconnexion}>
-              Se déconnecter
-            </button>
-          )}
+        <header className="bg-brand text-white shadow">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+            <Link to="/" className="text-lg font-bold text-white no-underline">
+              Audit RGAA 4
+            </Link>
+            {authentifie && (
+              <button type="button" className="btn btn-sm btn-secondary" onClick={deconnexion}>
+                Se déconnecter
+              </button>
+            )}
+          </div>
         </header>
-        <main id="contenu" className="contenu">
+        <main id="contenu" className="mx-auto max-w-5xl space-y-6 px-4 py-8">
           {authentifie ? (
             <Routes>
               <Route path="/" element={<ProjetsPage />} />

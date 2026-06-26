@@ -1,242 +1,113 @@
-:root {
-  --bleu: #000091;
-  --rouge: #ce0500;
-  --vert: #18753c;
-  --gris: #666;
-  --bordure: #ccc;
+@import 'tailwindcss';
+
+@theme {
+  --color-brand: #000091;
+  --color-brand-dark: #00006e;
+  --color-danger: #ce0500;
+  --color-success: #18753c;
 }
 
-* {
-  box-sizing: border-box;
-}
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: #1a1a1a;
-  line-height: 1.5;
-}
+  h1 {
+    @apply text-2xl font-bold tracking-tight;
+  }
 
-a {
-  color: var(--bleu);
-}
+  h2 {
+    @apply text-lg font-semibold;
+  }
 
-:focus-visible {
-  outline: 3px solid var(--bleu);
-  outline-offset: 2px;
-}
+  h3 {
+    @apply text-base font-semibold text-gray-800;
+  }
 
-.skip-link {
-  position: absolute;
-  left: -9999px;
-}
-
-.skip-link:focus {
-  left: 8px;
-  top: 8px;
-  background: #fff;
-  padding: 8px;
-  z-index: 10;
-}
-
-.entete {
-  background: var(--bleu);
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.entete__logo {
-  color: #fff;
-  font-weight: bold;
-  text-decoration: none;
-  font-size: 18px;
-}
-
-.entete__deconnexion {
-  background: #fff;
-  color: var(--bleu);
-  border: 0;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.contenu {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-.grille {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-}
-
-@media (min-width: 1024px) {
-  .grille--2 {
-    grid-template-columns: 1fr 1fr;
+  /* Focus visible garanti (RGAA) sur tout élément interactif. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
   }
 }
 
-.carte {
-  border: 1px solid var(--bordure);
-  border-radius: 8px;
-  padding: 16px;
-}
+@layer components {
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white no-underline shadow-sm transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50;
+  }
 
-.champ {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 12px;
-}
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
 
-.champ input,
-.champ select {
-  padding: 8px;
-  border: 1px solid var(--bordure);
-  border-radius: 4px;
-  font-size: 15px;
-}
+  .btn-secondary {
+    @apply border border-gray-300 bg-white text-gray-800 shadow-none hover:bg-gray-100;
+  }
 
-.bouton {
-  background: var(--bleu);
-  color: #fff;
-  border: 0;
-  border-radius: 4px;
-  padding: 10px 16px;
-  font-size: 15px;
-  cursor: pointer;
-}
+  .btn-danger {
+    @apply bg-danger hover:bg-red-800;
+  }
 
-.bouton:disabled {
-  background: var(--gris);
-  cursor: not-allowed;
-}
+  .card {
+    @apply rounded-xl border border-gray-200 bg-white p-5 shadow-sm;
+  }
 
-.bouton--danger {
-  background: var(--rouge);
-}
+  .field {
+    @apply flex flex-col gap-1.5;
+  }
 
-.bouton--petit {
-  padding: 5px 10px;
-  font-size: 13px;
-}
+  .field > label {
+    @apply text-sm font-medium text-gray-700;
+  }
 
-.barre-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
+  .input,
+  .field input,
+  .field select {
+    @apply w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm;
+  }
 
-.actions {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+  .actions {
+    @apply flex flex-wrap items-center gap-2;
+  }
 
-.aide {
-  color: var(--gris);
-  font-size: 14px;
-  margin-top: 0;
-}
+  .table {
+    @apply w-full border-collapse text-sm;
+  }
 
-.cellule-edition input {
-  width: 100%;
-  padding: 6px;
-  border: 1px solid var(--bordure);
-  border-radius: 4px;
-}
+  .table th {
+    @apply border-b-2 border-gray-200 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700;
+  }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+  .table td {
+    @apply border-b border-gray-100 px-3 py-2 align-middle;
+  }
 
-th,
-td {
-  border: 1px solid var(--bordure);
-  padding: 8px;
-  text-align: left;
-  vertical-align: top;
-}
+  .table tbody tr:hover {
+    @apply bg-gray-50;
+  }
 
-th {
-  background: #f0f0f5;
-}
+  .badge {
+    @apply inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
 
-.statut--conforme {
-  color: var(--vert);
-  font-weight: bold;
-}
+  .badge-conforme {
+    @apply bg-green-100 text-green-800;
+  }
 
-.statut--non_conforme {
-  color: var(--rouge);
-  font-weight: bold;
-}
+  .badge-non_conforme {
+    @apply bg-red-100 text-red-800;
+  }
 
-.statut--non_applicable,
-.statut--non_teste {
-  color: var(--gris);
-}
+  .badge-non_applicable,
+  .badge-non_teste {
+    @apply bg-gray-100 text-gray-600;
+  }
 
-.taux {
-  font-size: 32px;
-  font-weight: bold;
-  color: var(--bleu);
-}
+  .skip-link {
+    @apply sr-only;
+  }
 
-.cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.card {
-  flex: 1 1 140px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 16px;
-  border: 1px solid var(--bordure);
-  border-radius: 8px;
-  background: #fff;
-}
-
-.card--principal {
-  background: var(--bleu);
-  color: #fff;
-  flex-basis: 200px;
-}
-
-.card__valeur {
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.card__label {
-  font-size: 13px;
-  color: var(--gris);
-  text-align: center;
-}
-
-.card--principal .card__label {
-  color: #fff;
-}
-
-.visuellement-cache {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+  .skip-link:focus {
+    @apply not-sr-only fixed left-3 top-3 z-50 rounded bg-white px-3 py-2 shadow;
+  }
 }

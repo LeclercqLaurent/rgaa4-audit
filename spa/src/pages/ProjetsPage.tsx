@@ -11,13 +11,13 @@ const LIBELLE_STATUT: Record<DernierScan['statut'], string> = {
 
 function ResumeScan({ scan }: { scan: DernierScan | null }) {
   if (!scan) {
-    return <>—</>;
+    return <span className="text-gray-400">—</span>;
   }
 
   return (
-    <>
-      {LIBELLE_STATUT[scan.statut]} <small>({new Date(scan.date).toLocaleDateString('fr-FR')})</small>
-    </>
+    <span>
+      {LIBELLE_STATUT[scan.statut]} <span className="text-xs text-gray-500">({new Date(scan.date).toLocaleDateString('fr-FR')})</span>
+    </span>
   );
 }
 
@@ -27,9 +27,9 @@ export default function ProjetsPage() {
 
   return (
     <>
-      <div className="barre-actions">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1>Projets d'audit RGAA</h1>
-        <button type="button" className="bouton" onClick={() => setCreation((v) => !v)} aria-expanded={creation}>
+        <button type="button" className="btn" onClick={() => setCreation((v) => !v)} aria-expanded={creation}>
           {creation ? 'Fermer' : '+ Nouveau projet'}
         </button>
       </div>
@@ -38,27 +38,29 @@ export default function ProjetsPage() {
 
       {isLoading && <p>Chargement…</p>}
       {isError && <p role="alert">Impossible de charger les projets.</p>}
-      {projets && projets.length === 0 && <p>Aucun projet. Créez-en un avec « Nouveau projet ».</p>}
+      {projets && projets.length === 0 && <p className="text-gray-500">Aucun projet. Créez-en un avec « Nouveau projet ».</p>}
 
       {projets && projets.length > 0 && (
-        <table>
-          <caption className="visuellement-cache">Liste des projets d'audit</caption>
-          <thead>
-            <tr>
-              <th scope="col">Nom</th>
-              <th scope="col">Client</th>
-              <th scope="col">URL de référence</th>
-              <th scope="col">Pages</th>
-              <th scope="col">Dernier scan</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projets.map((projet) => (
-              <LigneProjet key={projet.id} projet={projet} />
-            ))}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+          <table className="table">
+            <caption className="sr-only">Liste des projets d'audit</caption>
+            <thead>
+              <tr>
+                <th scope="col">Nom</th>
+                <th scope="col">Client</th>
+                <th scope="col">URL de référence</th>
+                <th scope="col">Pages</th>
+                <th scope="col">Dernier scan</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {projets.map((projet) => (
+                <LigneProjet key={projet.id} projet={projet} />
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );
@@ -76,28 +78,26 @@ function FormulaireCreation({ onCree }: { onCree: () => void }) {
   };
 
   return (
-    <section className="carte" aria-labelledby="creer-titre">
+    <section className="card space-y-4" aria-labelledby="creer-titre">
       <h2 id="creer-titre">Nouveau projet</h2>
-      <form onSubmit={soumettre} className="grille grille--2">
-        <div className="champ">
+      <form onSubmit={soumettre} className="grid grid-cols-1 items-end gap-4 lg:grid-cols-2">
+        <div className="field">
           <label htmlFor="nom">Nom du projet</label>
           <input id="nom" required value={nom} onChange={(e) => setNom(e.target.value)} />
         </div>
-        <div className="champ">
+        <div className="field">
           <label htmlFor="client">Client</label>
           <input id="client" required value={client} onChange={(e) => setClient(e.target.value)} />
         </div>
-        <div className="champ">
+        <div className="field">
           <label htmlFor="url">URL de référence</label>
           <input id="url" type="url" required placeholder="https://exemple.fr" value={urlReference} onChange={(e) => setUrlReference(e.target.value)} />
         </div>
-        <div className="champ" style={{ alignSelf: 'end' }}>
-          <button className="bouton" type="submit" disabled={creer.isPending}>
-            {creer.isPending ? 'Création…' : 'Créer le projet'}
-          </button>
-        </div>
+        <button className="btn" type="submit" disabled={creer.isPending}>
+          {creer.isPending ? 'Création…' : 'Créer le projet'}
+        </button>
         {creer.isError && (
-          <p role="alert" className="statut--non_conforme">
+          <p role="alert" className="text-sm font-medium text-danger">
             La création a échoué.
           </p>
         )}
@@ -134,14 +134,14 @@ function LigneProjet({ projet }: { projet: Projet }) {
   if (edition) {
     return (
       <tr>
-        <td className="cellule-edition">
-          <input aria-label="Nom" value={nom} onChange={(e) => setNom(e.target.value)} />
+        <td>
+          <input className="input" aria-label="Nom" value={nom} onChange={(e) => setNom(e.target.value)} />
         </td>
-        <td className="cellule-edition">
-          <input aria-label="Client" value={client} onChange={(e) => setClient(e.target.value)} />
+        <td>
+          <input className="input" aria-label="Client" value={client} onChange={(e) => setClient(e.target.value)} />
         </td>
-        <td className="cellule-edition">
-          <input aria-label="URL de référence" type="url" value={urlReference} onChange={(e) => setUrlReference(e.target.value)} />
+        <td>
+          <input className="input" aria-label="URL de référence" type="url" value={urlReference} onChange={(e) => setUrlReference(e.target.value)} />
         </td>
         <td>{projet.pages.length}</td>
         <td>
@@ -149,10 +149,10 @@ function LigneProjet({ projet }: { projet: Projet }) {
         </td>
         <td>
           <div className="actions">
-            <button type="button" className="bouton bouton--petit" onClick={enregistrer} disabled={modifier.isPending}>
+            <button type="button" className="btn btn-sm" onClick={enregistrer} disabled={modifier.isPending}>
               Enregistrer
             </button>
-            <button type="button" className="bouton bouton--petit" onClick={() => setEdition(false)}>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={() => setEdition(false)}>
               Annuler
             </button>
           </div>
@@ -163,36 +163,31 @@ function LigneProjet({ projet }: { projet: Projet }) {
 
   return (
     <tr>
-      <td>
+      <td className="font-medium">
         <Link to={`/projets/${projet.id}`}>{projet.nom}</Link>
       </td>
       <td>{projet.client}</td>
-      <td>{projet.urlReference}</td>
+      <td className="max-w-xs truncate text-gray-600">{projet.urlReference}</td>
       <td>{projet.pages.length}</td>
       <td>
         <ResumeScan scan={projet.dernierScan} />
       </td>
       <td>
         <div className="actions">
-          <Link className="bouton bouton--petit" to={`/projets/${projet.id}`}>
+          <Link className="btn btn-sm btn-secondary" to={`/projets/${projet.id}`}>
             Ouvrir
           </Link>
           {projet.dernierScan?.statut === 'done' && (
-            <button
-              type="button"
-              className="bouton bouton--petit"
-              onClick={() => void ouvrirRapport(projet.id, true)}
-              aria-label={`Rapport PDF de ${projet.nom}`}
-            >
+            <button type="button" className="btn btn-sm btn-secondary" onClick={() => void ouvrirRapport(projet.id, true)} aria-label={`Rapport PDF de ${projet.nom}`}>
               PDF
             </button>
           )}
-          <button type="button" className="bouton bouton--petit" onClick={ouvrirEdition} aria-label={`Modifier ${projet.nom}`}>
+          <button type="button" className="btn btn-sm btn-secondary" onClick={ouvrirEdition} aria-label={`Modifier ${projet.nom}`}>
             Modifier
           </button>
           <button
             type="button"
-            className="bouton bouton--petit bouton--danger"
+            className="btn btn-sm btn-danger"
             onClick={supprimerProjet}
             disabled={supprimer.isPending}
             aria-label={`Supprimer ${projet.nom}`}
