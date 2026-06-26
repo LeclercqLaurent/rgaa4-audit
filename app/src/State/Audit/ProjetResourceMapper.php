@@ -19,18 +19,24 @@ final readonly class ProjetResourceMapper
 {
     public function toResource(Projet $projet, ?ResumeScan $dernierScan = null): ProjetResource
     {
-        return new ProjetResource(
+        $resource = new ProjetResource(
             $projet->id(),
             $projet->nom(),
             $projet->client(),
-            (string) $projet->urlReference(),
+            $projet->type()->value,
+            $projet->cible(),
             $projet->dateCreation()->format(DateTimeInterface::ATOM),
             array_map($this->pageToResource(...), $projet->pages()),
-            null === $dernierScan ? null : new DernierScanResource(
+        );
+
+        if (null !== $dernierScan) {
+            $resource->dernierScan = new DernierScanResource(
                 $dernierScan->statut->value,
                 $dernierScan->dateCreation->format(DateTimeInterface::ATOM),
-            ),
-        );
+            );
+        }
+
+        return $resource;
     }
 
     public function pageToResource(Page $page): PageResource

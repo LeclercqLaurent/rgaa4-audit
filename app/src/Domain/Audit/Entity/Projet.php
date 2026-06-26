@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Domain\Audit\Entity;
 
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\Url;
 use DateTimeImmutable;
 
 /**
- * Projet d'audit RGAA : racine d'agrégat regroupant l'échantillon de pages.
+ * Projet d'audit : racine d'agrégat. Son type (RGAA 4 ou Complexité PHP) est
+ * choisi à la création et détermine le moteur ; la cible est l'URL du site
+ * (RGAA, avec un échantillon de pages) ou le chemin du code (Complexité).
  */
 final class Projet
 {
@@ -19,7 +22,8 @@ final class Projet
         private readonly string $id,
         private string $nom,
         private string $client,
-        private Url $urlReference,
+        private readonly Referentiel $type,
+        private string $cible,
         private readonly DateTimeImmutable $dateCreation,
         private array $pages = [],
     ) {
@@ -30,11 +34,11 @@ final class Projet
         $this->pages[] = $page;
     }
 
-    public function modifier(string $nom, string $client, Url $urlReference): void
+    public function modifier(string $nom, string $client, string $cible): void
     {
         $this->nom = $nom;
         $this->client = $client;
-        $this->urlReference = $urlReference;
+        $this->cible = $cible;
     }
 
     public function supprimerPage(string $pageId): void
@@ -65,9 +69,14 @@ final class Projet
         return $this->client;
     }
 
-    public function urlReference(): Url
+    public function type(): Referentiel
     {
-        return $this->urlReference;
+        return $this->type;
+    }
+
+    public function cible(): string
+    {
+        return $this->cible;
     }
 
     public function dateCreation(): DateTimeImmutable

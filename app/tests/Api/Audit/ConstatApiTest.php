@@ -45,7 +45,7 @@ final class ConstatApiTest extends ApiSecuriseeTestCase
     private function creerProjetAvecPage(object $client): string
     {
         $reponse = $client->request('POST', '/api/projets', [
-            'json' => ['nom' => 'Projet constats', 'client' => 'Client', 'urlReference' => 'https://exemple.fr'],
+            'json' => ['nom' => 'Projet constats', 'client' => 'Client', 'type' => 'rgaa', 'cible' => 'https://exemple.fr'],
         ]);
         /** @var array{id: string} $data */
         $data = $reponse->toArray();

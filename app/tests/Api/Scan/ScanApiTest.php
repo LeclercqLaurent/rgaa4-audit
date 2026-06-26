@@ -52,7 +52,7 @@ final class ScanApiTest extends ApiSecuriseeTestCase
     private function creerProjetAvecPage(object $client): string
     {
         $reponse = $client->request('POST', '/api/projets', [
-            'json' => ['nom' => 'Projet scan', 'client' => 'Client', 'urlReference' => 'https://exemple.fr'],
+            'json' => ['nom' => 'Projet scan', 'client' => 'Client', 'type' => 'rgaa', 'cible' => 'https://exemple.fr'],
         ]);
         /** @var array{id: string} $data */
         $data = $reponse->toArray();

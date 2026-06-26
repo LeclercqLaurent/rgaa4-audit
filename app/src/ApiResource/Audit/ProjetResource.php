@@ -15,6 +15,7 @@ use App\ApiResource\Audit\Input\AjouterPageInput;
 use App\ApiResource\Audit\Input\CreerProjetInput;
 use App\ApiResource\Audit\Input\ModifierProjetInput;
 use App\Domain\Audit\Exception\ProjetIntrouvable;
+use App\Domain\Audit\Exception\UrlInvalide;
 use App\State\Audit\ModifierProjetProcessor;
 use App\State\Audit\PageProcessor;
 use App\State\Audit\ProjetProcessor;
@@ -29,11 +30,12 @@ use App\State\Audit\SupprimerProjetProcessor;
         new Post(
             input: CreerProjetInput::class,
             processor: ProjetProcessor::class,
+            exceptionToStatus: [UrlInvalide::class => 422],
         ),
         new Patch(
             input: ModifierProjetInput::class,
             processor: ModifierProjetProcessor::class,
-            exceptionToStatus: [ProjetIntrouvable::class => 404],
+            exceptionToStatus: [ProjetIntrouvable::class => 404, UrlInvalide::class => 422],
         ),
         new Delete(
             processor: SupprimerProjetProcessor::class,
@@ -50,6 +52,8 @@ use App\State\Audit\SupprimerProjetProcessor;
 )]
 final class ProjetResource
 {
+    public ?DernierScanResource $dernierScan = null;
+
     /**
      * @param list<PageResource> $pages
      */
@@ -58,10 +62,10 @@ final class ProjetResource
         public string $id,
         public string $nom,
         public string $client,
-        public string $urlReference,
+        public string $type,
+        public string $cible,
         public string $dateCreation,
         public array $pages,
-        public ?DernierScanResource $dernierScan = null,
     ) {
     }
 }

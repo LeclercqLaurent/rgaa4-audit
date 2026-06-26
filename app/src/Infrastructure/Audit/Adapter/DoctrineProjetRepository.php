@@ -7,6 +7,7 @@ namespace App\Infrastructure\Audit\Adapter;
 use App\Domain\Audit\Entity\Page;
 use App\Domain\Audit\Entity\Projet;
 use App\Domain\Audit\Port\ProjetRepository;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\Url;
 use App\Infrastructure\Persistence\Entity\PageEntity;
 use App\Infrastructure\Persistence\Entity\ProjetEntity;
@@ -27,12 +28,13 @@ final readonly class DoctrineProjetRepository implements ProjetRepository
                 $projet->id(),
                 $projet->nom(),
                 $projet->client(),
-                (string) $projet->urlReference(),
+                $projet->type()->value,
+                $projet->cible(),
                 $projet->dateCreation(),
             );
             $this->em->persist($entity);
         } else {
-            $entity->mettreAJour($projet->nom(), $projet->client(), (string) $projet->urlReference());
+            $entity->mettreAJour($projet->nom(), $projet->client(), $projet->cible());
         }
 
         $this->synchroniserPages($projet, $entity);
@@ -100,7 +102,8 @@ final readonly class DoctrineProjetRepository implements ProjetRepository
             $entity->getId(),
             $entity->getNom(),
             $entity->getClient(),
-            new Url($entity->getUrlReference()),
+            Referentiel::from($entity->getType()),
+            $entity->getCible(),
             $entity->getDateCreation(),
             array_values($pages),
         );

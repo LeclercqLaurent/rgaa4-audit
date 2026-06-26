@@ -27,19 +27,21 @@ class ProjetEntity
         private string $nom,
         #[ORM\Column(length: 150, options: ['collation' => 'utf8mb4_uca1400_ai_ci'])]
         private string $client,
+        #[ORM\Column(length: 20, options: ['charset' => 'ascii', 'collation' => 'ascii_bin'])]
+        private string $type,
         #[ORM\Column(name: 'url_reference', length: 2048)]
-        private string $urlReference,
+        private string $cible,
         #[ORM\Column(name: 'date_creation', type: 'datetime_immutable')]
         private DateTimeImmutable $dateCreation,
     ) {
         $this->pages = new ArrayCollection();
     }
 
-    public function mettreAJour(string $nom, string $client, string $urlReference): void
+    public function mettreAJour(string $nom, string $client, string $cible): void
     {
         $this->nom = $nom;
         $this->client = $client;
-        $this->urlReference = $urlReference;
+        $this->cible = $cible;
     }
 
     public function getId(): string
@@ -57,9 +59,14 @@ class ProjetEntity
         return $this->client;
     }
 
-    public function getUrlReference(): string
+    public function getType(): string
     {
-        return $this->urlReference;
+        return $this->type;
+    }
+
+    public function getCible(): string
+    {
+        return $this->cible;
     }
 
     public function getDateCreation(): DateTimeImmutable

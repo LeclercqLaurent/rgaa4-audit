@@ -3,11 +3,13 @@ import { ArrowLeft, Check, Download, ExternalLink, FileText, Pencil, Play, Plus,
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
+  LIBELLE_TYPE,
   Page,
   Projet,
   Statut,
   ouvrirRapport,
   useAjouterPage,
+  useAnalyserComplexite,
   useConsommerScans,
   useConstats,
   useDefinirStatut,
@@ -87,7 +89,7 @@ export default function ProjetPage() {
       </Link>
       <Entete projet={projet} />
       <TauxSection projetId={projetId} />
-      <PagesSection projetId={projetId} pages={projet.pages} />
+      {'rgaa' === projet.type && <PagesSection projetId={projetId} pages={projet.pages} />}
       <ConstatsSection projetId={projetId} />
     </div>
   );
@@ -97,6 +99,8 @@ function Entete({ projet }: { projet: Projet }) {
   const { data: scans } = useScans(projet.id);
   const lancer = useLancerScan(projet.id);
   const consommer = useConsommerScans(projet.id);
+  const analyser = useAnalyserComplexite(projet.id);
+  const estRgaa = 'rgaa' === projet.type;
   const dernier = scans?.[0];
 
   return (
@@ -105,14 +109,21 @@ function Entete({ projet }: { projet: Projet }) {
         <div className="space-y-2">
           <h1 id="projet-titre">{projet.nom}</h1>
           <p className="text-gray-600">{projet.client}</p>
-          <a href={projet.urlReference} className="inline-block break-all text-sm" target="_blank" rel="noopener noreferrer">
-            {projet.urlReference} ↗
-          </a>
+          {estRgaa ? (
+            <a href={projet.cible} className="inline-block break-all text-sm" target="_blank" rel="noopener noreferrer">
+              {projet.cible} ↗
+            </a>
+          ) : (
+            <code className="inline-block break-all rounded bg-gray-100 px-2 py-0.5 text-sm text-gray-700">{projet.cible}</code>
+          )}
           <div className="flex flex-wrap gap-2 pt-1">
-            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-              {projet.pages.length} page{projet.pages.length > 1 ? 's' : ''}
-            </span>
-            {dernier && (
+            <span className="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand">{LIBELLE_TYPE[projet.type]}</span>
+            {estRgaa && (
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                {projet.pages.length} page{projet.pages.length > 1 ? 's' : ''}
+              </span>
+            )}
+            {estRgaa && dernier && (
               <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${SCAN_BADGE[dernier.statut] ?? 'bg-gray-100 text-gray-700'}`}>
                 Scan : {LIBELLE_SCAN[dernier.statut] ?? dernier.statut}
               </span>
@@ -122,13 +133,22 @@ function Entete({ projet }: { projet: Projet }) {
 
         <div className="flex shrink-0 flex-col gap-2">
           <div className="actions">
-            <button className="btn" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
-              <Play size={16} aria-hidden="true" /> Lancer un scan
-            </button>
-            <button className="btn btn-secondary" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
-              <RefreshCw size={16} aria-hidden="true" className={consommer.isPending ? 'animate-spin' : ''} />
-              {consommer.isPending ? 'Traitement…' : 'Traiter la file'}
-            </button>
+            {estRgaa ? (
+              <>
+                <button className="btn" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
+                  <Play size={16} aria-hidden="true" /> Lancer un scan
+                </button>
+                <button className="btn btn-secondary" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
+                  <RefreshCw size={16} aria-hidden="true" className={consommer.isPending ? 'animate-spin' : ''} />
+                  {consommer.isPending ? 'Traitement…' : 'Traiter la file'}
+                </button>
+              </>
+            ) : (
+              <button className="btn" type="button" onClick={() => analyser.mutate()} disabled={analyser.isPending}>
+                <RefreshCw size={16} aria-hidden="true" className={analyser.isPending ? 'animate-spin' : ''} />
+                {analyser.isPending ? 'Analyse…' : 'Analyser le code'}
+              </button>
+            )}
           </div>
           <div className="actions">
             <button type="button" className="btn btn-sm btn-secondary" onClick={() => void ouvrirRapport(projet.id, false)}>
@@ -141,12 +161,17 @@ function Entete({ projet }: { projet: Projet }) {
         </div>
       </div>
 
-      {consommer.isSuccess && (
+      {estRgaa && consommer.isSuccess && (
         <p className="mt-3 text-sm text-gray-600" aria-live="polite">
           {consommer.data.traites} message(s) traité(s).
         </p>
       )}
-      {dernier?.erreur && (
+      {!estRgaa && analyser.isSuccess && (
+        <p className="mt-3 text-sm text-gray-600" aria-live="polite">
+          {analyser.data.traites} constat(s) de complexité générés.
+        </p>
+      )}
+      {estRgaa && dernier?.erreur && (
         <p className="mt-3 text-sm text-danger" aria-live="polite">
           Dernier scan en échec : {dernier.erreur}
         </p>

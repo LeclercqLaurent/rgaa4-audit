@@ -20,4 +20,12 @@ enum Referentiel: string
             self::ComplexitePhp => 'Complexité PHP',
         };
     }
+
+    /**
+     * @return list<string>
+     */
+    public static function valeurs(): array
+    {
+        return array_map(static fn (self $r): string => $r->value, self::cases());
+    }
 }

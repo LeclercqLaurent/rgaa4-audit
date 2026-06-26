@@ -49,7 +49,8 @@ describe('ProjetsPage', () => {
     await userEvent.click(screen.getByRole('button', { name: /Nouveau projet/ }));
 
     expect(screen.getByLabelText('Nom du projet')).toBeInTheDocument();
-    expect(screen.getByLabelText('URL de référence')).toBeInTheDocument();
+    expect(screen.getByLabelText("Type d'audit")).toBeInTheDocument();
+    expect(screen.getByLabelText('URL du site à auditer')).toBeInTheDocument();
   });
 
   it("ne présente aucune violation d'accessibilité", async () => {

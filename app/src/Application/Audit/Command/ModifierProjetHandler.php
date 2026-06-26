@@ -6,6 +6,7 @@ namespace App\Application\Audit\Command;
 
 use App\Domain\Audit\Exception\ProjetIntrouvable;
 use App\Domain\Audit\Port\ProjetRepository;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\Url;
 
 final readonly class ModifierProjetHandler
@@ -22,7 +23,12 @@ final readonly class ModifierProjetHandler
             throw ProjetIntrouvable::pour($command->id);
         }
 
-        $projet->modifier($command->nom, $command->client, new Url($command->urlReference));
+        if (Referentiel::Rgaa === $projet->type()) {
+            // Valide que la cible reste une URL http(s) pour un projet RGAA.
+            new Url($command->cible);
+        }
+
+        $projet->modifier($command->nom, $command->client, $command->cible);
         $this->projets->save($projet);
     }
 }

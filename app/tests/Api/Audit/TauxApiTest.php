@@ -56,7 +56,7 @@ final class TauxApiTest extends ApiSecuriseeTestCase
     private function creerProjetScanne(object $client): string
     {
         $data = $client->request('POST', '/api/projets', [
-            'json' => ['nom' => 'Projet taux', 'client' => 'Client', 'urlReference' => 'https://exemple.fr'],
+            'json' => ['nom' => 'Projet taux', 'client' => 'Client', 'type' => 'rgaa', 'cible' => 'https://exemple.fr'],
         ])->toArray();
         $projetId = is_string($data['id']) ? $data['id'] : '';
         $client->request('POST', '/api/projets/'.$projetId.'/pages', ['json' => ['url' => self::URL_PAGE, 'titre' => 'Accueil']]);

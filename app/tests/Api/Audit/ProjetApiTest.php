@@ -32,7 +32,8 @@ final class ProjetApiTest extends ApiSecuriseeTestCase
             'json' => [
                 'nom' => 'Audit site mairie',
                 'client' => 'Mairie de Démo',
-                'urlReference' => 'https://exemple.fr',
+                'type' => 'rgaa',
+                'cible' => 'https://exemple.fr',
             ],
         ]);
 
@@ -40,8 +41,29 @@ final class ProjetApiTest extends ApiSecuriseeTestCase
         $this->assertJsonContains([
             'nom' => 'Audit site mairie',
             'client' => 'Mairie de Démo',
-            'urlReference' => 'https://exemple.fr',
+            'type' => 'rgaa',
+            'cible' => 'https://exemple.fr',
             'pages' => [],
+        ]);
+    }
+
+    public function testCreerUnProjetDeComplexiteAccepteUnCheminCode(): void
+    {
+        $client = $this->clientAuthentifie();
+
+        $client->request('POST', '/api/projets', [
+            'json' => [
+                'nom' => 'Audit complexité',
+                'client' => 'Interne',
+                'type' => 'complexite_php',
+                'cible' => '/var/www/app/src',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertJsonContains([
+            'type' => 'complexite_php',
+            'cible' => '/var/www/app/src',
         ]);
     }
 
@@ -66,7 +88,7 @@ final class ProjetApiTest extends ApiSecuriseeTestCase
         $client = $this->clientAuthentifie();
 
         $client->request('POST', '/api/projets', [
-            'json' => ['nom' => 'X', 'client' => 'Y', 'urlReference' => 'pas-une-url'],
+            'json' => ['nom' => 'X', 'client' => 'Y', 'type' => 'rgaa', 'cible' => 'pas-une-url'],
         ]);
 
         $this->assertResponseStatusCodeSame(422);
@@ -95,7 +117,7 @@ final class ProjetApiTest extends ApiSecuriseeTestCase
 
         $client->request('PATCH', '/api/projets/'.$id, [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
-            'body' => json_encode(['nom' => 'Audit renommé', 'client' => 'Nouveau client', 'urlReference' => 'https://exemple.fr']),
+            'body' => json_encode(['nom' => 'Audit renommé', 'client' => 'Nouveau client', 'cible' => 'https://exemple.fr']),
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -167,7 +189,7 @@ final class ProjetApiTest extends ApiSecuriseeTestCase
     private function creerProjet(object $client): string
     {
         $reponse = $client->request('POST', '/api/projets', [
-            'json' => ['nom' => 'Projet test', 'client' => 'Client test', 'urlReference' => 'https://exemple.fr'],
+            'json' => ['nom' => 'Projet test', 'client' => 'Client test', 'type' => 'rgaa', 'cible' => 'https://exemple.fr'],
         ]);
 
         /** @var array{id: string} $data */

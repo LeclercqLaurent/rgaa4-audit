@@ -52,7 +52,7 @@ final readonly class ObtenirRapportHandler
         return new Rapport(
             $projet->nom(),
             $projet->client(),
-            (string) $projet->urlReference(),
+            $projet->cible(),
             (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
             $taux,
             $this->sections($thematiques, $effectifs, $taux),

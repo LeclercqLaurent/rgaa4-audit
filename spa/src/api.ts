@@ -84,11 +84,19 @@ export type Page = { id: string; url: string; titre: string };
 
 export type DernierScan = { statut: Scan['statut']; date: string };
 
+export type TypeAudit = 'rgaa' | 'complexite_php';
+
+export const LIBELLE_TYPE: Record<TypeAudit, string> = {
+  rgaa: 'RGAA 4',
+  complexite_php: 'Complexité PHP',
+};
+
 export type Projet = {
   id: string;
   nom: string;
   client: string;
-  urlReference: string;
+  type: TypeAudit;
+  cible: string;
   dateCreation: string;
   pages: Page[];
   dernierScan: DernierScan | null;
@@ -225,7 +233,7 @@ export function useScans(projetId: string) {
 export function useCreerProjet() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: { nom: string; client: string; urlReference: string }) =>
+    mutationFn: (body: { nom: string; client: string; type: TypeAudit; cible: string }) =>
       request<Projet>('/api/projets', { method: 'POST', body: JSON.stringify(body) }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['projets'] }),
   });
@@ -234,7 +242,7 @@ export function useCreerProjet() {
 export function useModifierProjet(id: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: { nom: string; client: string; urlReference: string }) =>
+    mutationFn: (body: { nom: string; client: string; cible: string }) =>
       request<Projet>(`/api/projets/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/merge-patch+json' },
@@ -299,6 +307,17 @@ export function useLancerScan(projetId: string) {
   return useMutation({
     mutationFn: () => request<Scan>(`/api/projets/${projetId}/scans`, { method: 'POST', body: '{}' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['scans', projetId] }),
+  });
+}
+
+export function useAnalyserComplexite(projetId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => request<{ traites: number }>(`/api/projets/${projetId}/analyse`, { method: 'POST', body: '{}' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['constats', projetId] });
+      qc.invalidateQueries({ queryKey: ['taux', projetId] });
+    },
   });
 }
 

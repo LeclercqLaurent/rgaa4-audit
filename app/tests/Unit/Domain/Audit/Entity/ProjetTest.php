@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Domain\Audit\Entity;
 
 use App\Domain\Audit\Entity\Page;
 use App\Domain\Audit\Entity\Projet;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\Url;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
@@ -35,7 +36,8 @@ final class ProjetTest extends TestCase
             'projet-1',
             'Audit démo',
             'Client démo',
-            new Url('https://exemple.fr'),
+            Referentiel::Rgaa,
+            'https://exemple.fr',
             new DateTimeImmutable('2026-01-01T00:00:00+00:00'),
         );
     }

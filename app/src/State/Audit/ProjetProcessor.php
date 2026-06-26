@@ -12,6 +12,7 @@ use App\Application\Audit\Command\CreerProjet;
 use App\Application\Audit\Command\CreerProjetHandler;
 use App\Application\Audit\Query\ObtenirProjet;
 use App\Application\Audit\Query\ObtenirProjetHandler;
+use App\Domain\Audit\ValueObject\Referentiel;
 use RuntimeException;
 
 /**
@@ -33,7 +34,7 @@ final readonly class ProjetProcessor implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ProjetResource
     {
-        $id = ($this->creer)(new CreerProjet($data->nom, $data->client, $data->urlReference));
+        $id = ($this->creer)(new CreerProjet($data->nom, $data->client, Referentiel::from($data->type), $data->cible));
         $projet = ($this->obtenir)(new ObtenirProjet($id));
 
         return $this->mapper->toResource($projet ?? throw new RuntimeException('Projet créé introuvable.'));

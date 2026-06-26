@@ -10,7 +10,7 @@ final readonly class ModifierProjet
         public string $id,
         public string $nom,
         public string $client,
-        public string $urlReference,
+        public string $cible,
     ) {
     }
 }

@@ -8,6 +8,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Charge utile de modification d'un projet d'audit (PATCH /api/projets/{id}).
+ * Le type d'audit n'est pas modifiable ; la cible est validée selon le type
+ * côté handler.
  */
 final class ModifierProjetInput
 {
@@ -19,7 +21,7 @@ final class ModifierProjetInput
     #[Assert\Length(max: 150)]
     public string $client = '';
 
-    #[Assert\NotBlank(message: 'L\'URL de référence est obligatoire.')]
-    #[Assert\Url(protocols: ['http', 'https'], message: 'L\'URL de référence doit être une URL http(s) valide.')]
-    public string $urlReference = '';
+    #[Assert\NotBlank(message: 'La cible est obligatoire.')]
+    #[Assert\Length(max: 2048)]
+    public string $cible = '';
 }

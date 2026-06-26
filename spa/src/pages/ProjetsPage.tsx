@@ -1,7 +1,7 @@
 import { ArrowRight, Check, Download, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { DernierScan, Projet, ouvrirRapport, useCreerProjet, useModifierProjet, useProjets, useSupprimerProjet } from '../api';
+import { DernierScan, LIBELLE_TYPE, Projet, TypeAudit, ouvrirRapport, useCreerProjet, useModifierProjet, useProjets, useSupprimerProjet } from '../api';
 import { SkeletonTable } from '../components/Skeleton';
 
 const LIBELLE_STATUT: Record<DernierScan['statut'], string> = {
@@ -51,7 +51,7 @@ export default function ProjetsPage() {
               <tr>
                 <th scope="col">Nom</th>
                 <th scope="col">Client</th>
-                <th scope="col">URL de référence</th>
+                <th scope="col">Cible</th>
                 <th scope="col">Pages</th>
                 <th scope="col">Dernier scan</th>
                 <th scope="col" colSpan={4}>
@@ -75,11 +75,14 @@ function FormulaireCreation({ onCree }: { onCree: () => void }) {
   const creer = useCreerProjet();
   const [nom, setNom] = useState('');
   const [client, setClient] = useState('');
-  const [urlReference, setUrlReference] = useState('');
+  const [type, setType] = useState<TypeAudit>('rgaa');
+  const [cible, setCible] = useState('');
+
+  const estRgaa = 'rgaa' === type;
 
   const soumettre = (event: FormEvent) => {
     event.preventDefault();
-    creer.mutate({ nom, client, urlReference }, { onSuccess: onCree });
+    creer.mutate({ nom, client, type, cible }, { onSuccess: onCree });
   };
 
   return (
@@ -95,8 +98,22 @@ function FormulaireCreation({ onCree }: { onCree: () => void }) {
           <input id="client" required value={client} onChange={(e) => setClient(e.target.value)} />
         </div>
         <div className="field">
-          <label htmlFor="url">URL de référence</label>
-          <input id="url" type="url" required placeholder="https://exemple.fr" value={urlReference} onChange={(e) => setUrlReference(e.target.value)} />
+          <label htmlFor="type">Type d'audit</label>
+          <select id="type" value={type} onChange={(e) => setType(e.target.value as TypeAudit)}>
+            <option value="rgaa">{LIBELLE_TYPE.rgaa} — accessibilité d'un site</option>
+            <option value="complexite_php">{LIBELLE_TYPE.complexite_php} — complexité d'un code</option>
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="cible">{estRgaa ? 'URL du site à auditer' : 'Chemin du code à analyser'}</label>
+          <input
+            id="cible"
+            type={estRgaa ? 'url' : 'text'}
+            required
+            placeholder={estRgaa ? 'https://exemple.fr' : '/var/www/app/src'}
+            value={cible}
+            onChange={(e) => setCible(e.target.value)}
+          />
         </div>
         <button className="btn" type="submit" disabled={creer.isPending}>
           <Plus size={16} aria-hidden="true" /> {creer.isPending ? 'Création…' : 'Créer le projet'}
@@ -117,17 +134,18 @@ function LigneProjet({ projet }: { projet: Projet }) {
   const [edition, setEdition] = useState(false);
   const [nom, setNom] = useState(projet.nom);
   const [client, setClient] = useState(projet.client);
-  const [urlReference, setUrlReference] = useState(projet.urlReference);
+  const [cible, setCible] = useState(projet.cible);
+  const estRgaa = 'rgaa' === projet.type;
 
   const ouvrirEdition = () => {
     setNom(projet.nom);
     setClient(projet.client);
-    setUrlReference(projet.urlReference);
+    setCible(projet.cible);
     setEdition(true);
   };
 
   const enregistrer = () => {
-    modifier.mutate({ nom, client, urlReference }, { onSuccess: () => setEdition(false) });
+    modifier.mutate({ nom, client, cible }, { onSuccess: () => setEdition(false) });
   };
 
   const supprimerProjet = () => {
@@ -146,7 +164,7 @@ function LigneProjet({ projet }: { projet: Projet }) {
           <input className="input" aria-label="Client" value={client} onChange={(e) => setClient(e.target.value)} />
         </td>
         <td>
-          <input className="input" aria-label="URL de référence" type="url" value={urlReference} onChange={(e) => setUrlReference(e.target.value)} />
+          <input className="input" aria-label="Cible" type={estRgaa ? 'url' : 'text'} value={cible} onChange={(e) => setCible(e.target.value)} />
         </td>
         <td>{projet.pages.length}</td>
         <td>
@@ -170,9 +188,10 @@ function LigneProjet({ projet }: { projet: Projet }) {
     <tr>
       <td className="font-medium">
         <Link to={`/projets/${projet.id}`}>{projet.nom}</Link>
+        <span className="ml-2 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">{LIBELLE_TYPE[projet.type]}</span>
       </td>
       <td>{projet.client}</td>
-      <td className="max-w-xs truncate text-gray-600">{projet.urlReference}</td>
+      <td className="max-w-xs truncate text-gray-600">{projet.cible}</td>
       <td>{projet.pages.length}</td>
       <td>
         <ResumeScan scan={projet.dernierScan} />
