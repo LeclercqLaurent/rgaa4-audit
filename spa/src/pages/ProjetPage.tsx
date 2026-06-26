@@ -84,14 +84,22 @@ function PagesSection({ projetId, pages }: { projetId: string; pages: { id: stri
 
   return (
     <section className="carte" aria-labelledby="pages-titre">
-      <h2 id="pages-titre">Échantillon de pages</h2>
-      <ul>
-        {pages.map((page) => (
-          <li key={page.id}>
-            {page.titre} — <a href={page.url}>{page.url}</a>
-          </li>
-        ))}
-      </ul>
+      <h2 id="pages-titre">Pages à auditer (échantillon)</h2>
+      <p className="aide">
+        Les pages représentatives du site qui seront analysées au lancement du scan. En RGAA, l'audit porte sur un
+        échantillon de pages, pas sur le site entier.
+      </p>
+      {pages.length === 0 ? (
+        <p>Aucune page pour l'instant. Ajoutez les pages à analyser ci-dessous.</p>
+      ) : (
+        <ul>
+          {pages.map((page) => (
+            <li key={page.id}>
+              {page.titre} — <a href={page.url}>{page.url}</a>
+            </li>
+          ))}
+        </ul>
+      )}
       <form onSubmit={soumettre}>
         <div className="champ">
           <label htmlFor="page-url">URL de la page</label>
