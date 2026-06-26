@@ -38,12 +38,13 @@
     <h2>Déclaration d'accessibilité</h2>
     <p>
         Au regard des critères automatiquement évalués, le site est
-        {% if global >= 1 %}<strong>totalement conforme</strong>
+        {% if global is null %}<strong>non évalué</strong> (aucun critère évaluable automatiquement)
+        {% elseif global >= 1 %}<strong>totalement conforme</strong>
         {% elseif global > 0 %}<strong>partiellement conforme</strong>
         {% else %}<strong>non conforme</strong>{% endif %}
         au RGAA 4.
     </p>
-    <p class="taux">Taux de conformité : {{ (global * 100)|round(1) }} %</p>
+    <p class="taux">Taux de conformité : {% if global is null %}Non évalué{% else %}{{ (global * 100)|round(1) }} %{% endif %}</p>
     <p>
         {{ rapport.taux.conformes }} critère(s) conforme(s), {{ rapport.taux.nonConformes }} non conforme(s),
         {{ rapport.taux.nonApplicables }} non applicable(s), {{ rapport.taux.nonTestes }} non testé(s).

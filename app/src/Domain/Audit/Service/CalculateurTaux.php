@@ -27,8 +27,10 @@ final readonly class CalculateurTaux
             $this->ventiler($conformesParThematique, $totalParThematique, $constat);
         }
 
+        $evalues = $compteur['conformes'] + $compteur['nonConformes'];
+
         return new TauxConformite(
-            $this->ratio($compteur['conformes'], $compteur['nonConformes']),
+            $evalues > 0 ? $this->ratio($compteur['conformes'], $compteur['nonConformes']) : null,
             $this->tauxParThematique($conformesParThematique, $totalParThematique),
             $compteur['conformes'],
             $compteur['nonConformes'],

@@ -58,7 +58,7 @@ export type Constat = {
 };
 
 export type Taux = {
-  global: number;
+  global: number | null;
   parThematique: Record<string, number>;
   conformes: number;
   nonConformes: number;

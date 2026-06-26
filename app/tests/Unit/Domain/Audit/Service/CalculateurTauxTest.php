@@ -45,7 +45,7 @@ final class CalculateurTauxTest extends TestCase
     {
         $taux = (new CalculateurTaux())->calculer([$this->constat('1.1', StatutConformite::NonTeste)]);
 
-        self::assertSame(0.0, $taux->global);
+        self::assertNull($taux->global);
         self::assertSame([], $taux->parThematique);
     }
 

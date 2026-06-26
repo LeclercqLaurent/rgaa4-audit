@@ -135,7 +135,7 @@ function TauxSection({ projetId }: { projetId: string }) {
   return (
     <section aria-labelledby="taux-titre">
       <h2 id="taux-titre">Taux de conformité</h2>
-      <p className="taux">{Math.round(taux.global * 1000) / 10} %</p>
+      <p className="taux">{taux.global === null ? 'Non évalué' : `${Math.round(taux.global * 1000) / 10} %`}</p>
       <p>
         {taux.conformes} conforme(s), {taux.nonConformes} non conforme(s), {taux.nonApplicables} non applicable(s),{' '}
         {taux.nonTestes} non testé(s).
