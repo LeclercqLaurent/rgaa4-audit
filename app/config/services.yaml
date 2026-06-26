@@ -30,5 +30,11 @@ services:
     App\Domain\Referential\Port\ThematiqueRepository:
         '@App\Infrastructure\Referential\Adapter\DoctrineThematiqueRepository'
 
+    App\Domain\Audit\Port\ProjetRepository:
+        '@App\Infrastructure\Audit\Adapter\DoctrineProjetRepository'
+
+    App\Domain\Shared\Port\IdGenerator:
+        '@App\Infrastructure\Shared\Adapter\UuidV7Generator'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
