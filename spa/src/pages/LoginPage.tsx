@@ -1,3 +1,4 @@
+import { LogIn } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { connexion } from '../api';
 
@@ -46,7 +47,7 @@ export default function LoginPage({ onConnecte }: { onConnecte: () => void }) {
           </p>
         )}
         <button className="btn w-full" type="submit" disabled={enCours}>
-          {enCours ? 'Connexion…' : 'Se connecter'}
+          <LogIn size={16} aria-hidden="true" /> {enCours ? 'Connexion…' : 'Se connecter'}
         </button>
       </form>
     </section>

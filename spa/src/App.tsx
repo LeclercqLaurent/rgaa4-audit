@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { getJeton, purgerSession } from './api';
@@ -32,7 +33,7 @@ export default function App() {
             </Link>
             {authentifie && (
               <button type="button" className="btn btn-sm btn-secondary" onClick={deconnexion}>
-                Se déconnecter
+                <LogOut size={16} aria-hidden="true" /> Se déconnecter
               </button>
             )}
           </div>

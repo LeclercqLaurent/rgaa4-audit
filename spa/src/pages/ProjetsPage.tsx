@@ -1,6 +1,8 @@
+import { ArrowRight, Check, Download, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DernierScan, Projet, ouvrirRapport, useCreerProjet, useModifierProjet, useProjets, useSupprimerProjet } from '../api';
+import { SkeletonTable } from '../components/Skeleton';
 
 const LIBELLE_STATUT: Record<DernierScan['statut'], string> = {
   pending: 'En attente',
@@ -30,13 +32,14 @@ export default function ProjetsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1>Projets d'audit RGAA</h1>
         <button type="button" className="btn" onClick={() => setCreation((v) => !v)} aria-expanded={creation}>
-          {creation ? 'Fermer' : '+ Nouveau projet'}
+          {creation ? <X size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
+          {creation ? 'Fermer' : 'Nouveau projet'}
         </button>
       </div>
 
       {creation && <FormulaireCreation onCree={() => setCreation(false)} />}
 
-      {isLoading && <p>Chargement…</p>}
+      {isLoading && <SkeletonTable lignes={5} colonnes={6} />}
       {isError && <p role="alert">Impossible de charger les projets.</p>}
       {projets && projets.length === 0 && <p className="text-gray-500">Aucun projet. Créez-en un avec « Nouveau projet ».</p>}
 
@@ -96,7 +99,7 @@ function FormulaireCreation({ onCree }: { onCree: () => void }) {
           <input id="url" type="url" required placeholder="https://exemple.fr" value={urlReference} onChange={(e) => setUrlReference(e.target.value)} />
         </div>
         <button className="btn" type="submit" disabled={creer.isPending}>
-          {creer.isPending ? 'Création…' : 'Créer le projet'}
+          <Plus size={16} aria-hidden="true" /> {creer.isPending ? 'Création…' : 'Créer le projet'}
         </button>
         {creer.isError && (
           <p role="alert" className="text-sm font-medium text-danger">
@@ -152,10 +155,10 @@ function LigneProjet({ projet }: { projet: Projet }) {
         <td colSpan={4}>
           <div className="actions">
             <button type="button" className="btn btn-sm" onClick={enregistrer} disabled={modifier.isPending}>
-              Enregistrer
+              <Check size={14} aria-hidden="true" /> Enregistrer
             </button>
             <button type="button" className="btn btn-sm btn-secondary" onClick={() => setEdition(false)}>
-              Annuler
+              <X size={14} aria-hidden="true" /> Annuler
             </button>
           </div>
         </td>
@@ -176,19 +179,19 @@ function LigneProjet({ projet }: { projet: Projet }) {
       </td>
       <td className="pr-1">
         <Link className="btn btn-sm btn-secondary w-full" to={`/projets/${projet.id}`}>
-          Ouvrir
+          Ouvrir <ArrowRight size={14} aria-hidden="true" />
         </Link>
       </td>
       <td className="px-1">
         {projet.dernierScan?.statut === 'done' && (
           <button type="button" className="btn btn-sm btn-secondary w-full" onClick={() => void ouvrirRapport(projet.id, true)} aria-label={`Rapport PDF de ${projet.nom}`}>
-            PDF
+            <Download size={14} aria-hidden="true" /> PDF
           </button>
         )}
       </td>
       <td className="px-1">
         <button type="button" className="btn btn-sm btn-secondary w-full" onClick={ouvrirEdition} aria-label={`Modifier ${projet.nom}`}>
-          Modifier
+          <Pencil size={14} aria-hidden="true" /> Modifier
         </button>
       </td>
       <td className="pl-1">
@@ -199,7 +202,7 @@ function LigneProjet({ projet }: { projet: Projet }) {
           disabled={supprimer.isPending}
           aria-label={`Supprimer ${projet.nom}`}
         >
-          Supprimer
+          <Trash2 size={14} aria-hidden="true" /> Supprimer
         </button>
       </td>
     </tr>

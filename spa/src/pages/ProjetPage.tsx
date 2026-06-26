@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Check, Download, ExternalLink, FileText, Pencil, Play, Plus, RefreshCw, Trash2, X } from 'lucide-react';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
@@ -17,6 +18,8 @@ import {
   useSupprimerPage,
   useTaux,
 } from '../api';
+import { Donut } from '../components/Donut';
+import { Skeleton } from '../components/Skeleton';
 
 const LIBELLES: Record<Statut, string> = {
   conforme: 'Conforme',
@@ -58,7 +61,19 @@ export default function ProjetPage() {
   }, [dernierStatut, projetId, queryClient]);
 
   if (isLoading) {
-    return <p>Chargement…</p>;
+    return (
+      <div className="space-y-6" role="status" aria-label="Chargement du projet…">
+        <Skeleton className="h-4 w-32" />
+        <div className="card space-y-3">
+          <Skeleton className="h-7 w-1/2" />
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+        <div className="card">
+          <Skeleton className="h-28 w-full" />
+        </div>
+      </div>
+    );
   }
 
   if (!projet) {
@@ -67,8 +82,8 @@ export default function ProjetPage() {
 
   return (
     <div className="space-y-6">
-      <Link to="/" className="text-sm">
-        ← Tous les projets
+      <Link to="/" className="inline-flex items-center gap-1 text-sm">
+        <ArrowLeft size={16} aria-hidden="true" /> Tous les projets
       </Link>
       <Entete projet={projet} />
       <TauxSection projetId={projetId} />
@@ -108,18 +123,19 @@ function Entete({ projet }: { projet: Projet }) {
         <div className="flex shrink-0 flex-col gap-2">
           <div className="actions">
             <button className="btn" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
-              Lancer un scan
+              <Play size={16} aria-hidden="true" /> Lancer un scan
             </button>
             <button className="btn btn-secondary" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
+              <RefreshCw size={16} aria-hidden="true" className={consommer.isPending ? 'animate-spin' : ''} />
               {consommer.isPending ? 'Traitement…' : 'Traiter la file'}
             </button>
           </div>
           <div className="actions">
             <button type="button" className="btn btn-sm btn-secondary" onClick={() => void ouvrirRapport(projet.id, false)}>
-              Rapport HTML
+              <FileText size={14} aria-hidden="true" /> Rapport HTML
             </button>
             <button type="button" className="btn btn-sm btn-secondary" onClick={() => void ouvrirRapport(projet.id, true)}>
-              Rapport PDF
+              <Download size={14} aria-hidden="true" /> Rapport PDF
             </button>
           </div>
         </div>
@@ -158,18 +174,12 @@ function TauxSection({ projetId }: { projetId: string }) {
     <section className="space-y-3" aria-labelledby="taux-titre">
       <h2 id="taux-titre">Taux de conformité</h2>
       <div className="card">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-10">
-          <div className="shrink-0 text-center md:text-left">
-            <div className="text-5xl font-bold text-brand">{null === pourcentage ? 'Non évalué' : `${pourcentage} %`}</div>
-            <div className="mt-1 text-sm text-gray-500">Conformité (critères évaluables automatiquement)</div>
+        <div className="flex flex-col items-center gap-8 md:flex-row md:gap-12">
+          <div className="shrink-0 text-center">
+            <Donut value={pourcentage} />
+            <div className="mt-2 max-w-[150px] text-xs text-gray-500">Conformité des critères évaluables automatiquement</div>
           </div>
-          <div className="flex-1 space-y-4">
-            {null !== pourcentage && (
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200" role="presentation">
-                <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${pourcentage}%` }} />
-              </div>
-            )}
-            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <ul className="grid w-full flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
               {repartition.map((r) => (
                 <li key={r.label} className="rounded-lg border border-gray-100 bg-gray-50 p-3 text-center">
                   <div className={`text-2xl font-bold ${r.couleur}`}>{r.valeur}</div>
@@ -180,7 +190,6 @@ function TauxSection({ projetId }: { projetId: string }) {
                 </li>
               ))}
             </ul>
-          </div>
         </div>
       </div>
     </section>
@@ -260,10 +269,10 @@ function LignePage({ projetId, page }: { projetId: string; page: Page }) {
         <td colSpan={3}>
           <div className="actions">
             <button type="button" className="btn btn-sm" onClick={enregistrer} disabled={modifier.isPending}>
-              Enregistrer
+              <Check size={14} aria-hidden="true" /> Enregistrer
             </button>
             <button type="button" className="btn btn-sm btn-secondary" onClick={() => setEdition(false)}>
-              Annuler
+              <X size={14} aria-hidden="true" /> Annuler
             </button>
           </div>
         </td>
@@ -277,12 +286,12 @@ function LignePage({ projetId, page }: { projetId: string; page: Page }) {
       <td className="max-w-sm truncate text-gray-600">{page.url}</td>
       <td className="pr-1">
         <a className="btn btn-sm btn-secondary w-full" href={page.url} target="_blank" rel="noopener noreferrer">
-          Ouvrir
+          <ExternalLink size={14} aria-hidden="true" /> Ouvrir
         </a>
       </td>
       <td className="px-1">
         <button type="button" className="btn btn-sm btn-secondary w-full" onClick={ouvrirEdition} aria-label={`Modifier ${page.titre}`}>
-          Modifier
+          <Pencil size={14} aria-hidden="true" /> Modifier
         </button>
       </td>
       <td className="pl-1">
@@ -293,7 +302,7 @@ function LignePage({ projetId, page }: { projetId: string; page: Page }) {
           disabled={supprimer.isPending}
           aria-label={`Supprimer ${page.titre}`}
         >
-          Supprimer
+          <Trash2 size={14} aria-hidden="true" /> Supprimer
         </button>
       </td>
     </tr>
@@ -329,7 +338,7 @@ function FormulaireAjoutPage({ projetId }: { projetId: string }) {
         <input id="page-url" type="url" required placeholder="https://exemple.fr/contact" value={url} onChange={(e) => setUrl(e.target.value)} />
       </div>
       <button className="btn" type="submit" disabled={ajouter.isPending}>
-        Ajouter la page
+        <Plus size={16} aria-hidden="true" /> Ajouter la page
       </button>
     </form>
   );
