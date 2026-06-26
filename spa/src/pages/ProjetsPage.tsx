@@ -30,7 +30,7 @@ export default function ProjetsPage() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1>Projets d'audit RGAA</h1>
+        <h1>Projets d'audit</h1>
         <button type="button" className="btn" onClick={() => setCreation((v) => !v)} aria-expanded={creation}>
           {creation ? <X size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
           {creation ? 'Fermer' : 'Nouveau projet'}

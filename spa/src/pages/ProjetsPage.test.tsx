@@ -35,7 +35,7 @@ describe('ProjetsPage', () => {
   it('affiche le titre et la liste des projets en tableau', async () => {
     renderPage();
 
-    expect(screen.getByRole('heading', { level: 1, name: /Projets d'audit RGAA/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /Projets d'audit/i })).toBeInTheDocument();
     expect(await screen.findByRole('link', { name: 'Mairie de Démo' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Modifier Mairie de Démo/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Supprimer Mairie de Démo/ })).toBeInTheDocument();
