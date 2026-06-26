@@ -266,6 +266,33 @@ export function useAjouterPage(projetId: string) {
   });
 }
 
+export function useModifierPage(projetId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (p: { pageId: string; url: string; titre: string }) =>
+      request<void>(`/api/projets/${projetId}/pages/${p.pageId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/merge-patch+json' },
+        body: JSON.stringify({ url: p.url, titre: p.titre }),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['projet', projetId] });
+      qc.invalidateQueries({ queryKey: ['projets'] });
+    },
+  });
+}
+
+export function useSupprimerPage(projetId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (pageId: string) => request<void>(`/api/projets/${projetId}/pages/${pageId}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['projet', projetId] });
+      qc.invalidateQueries({ queryKey: ['projets'] });
+    },
+  });
+}
+
 export function useLancerScan(projetId: string) {
   const qc = useQueryClient();
   return useMutation({

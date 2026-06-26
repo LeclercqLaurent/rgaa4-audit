@@ -127,6 +127,43 @@ final class ProjetApiTest extends ApiSecuriseeTestCase
         $this->assertResponseStatusCodeSame(404);
     }
 
+    public function testModifierUnePageDeLEchantillon(): void
+    {
+        $client = $this->clientAuthentifie();
+        $id = $this->creerProjet($client);
+        $page = $client->request('POST', '/api/projets/'.$id.'/pages', ['json' => ['url' => 'https://exemple.fr/a', 'titre' => 'A']]);
+        /** @var array{pages: list<array{id: string}>} $projet */
+        $projet = $page->toArray();
+        $pageId = $projet['pages'][0]['id'];
+
+        $client->request('PATCH', '/api/projets/'.$id.'/pages/'.$pageId, [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'body' => json_encode(['url' => 'https://exemple.fr/accueil', 'titre' => 'Accueil']),
+        ]);
+        $this->assertResponseStatusCodeSame(204);
+
+        $client->request('GET', '/api/projets/'.$id);
+        $this->assertJsonContains(['pages' => [['url' => 'https://exemple.fr/accueil', 'titre' => 'Accueil']]]);
+    }
+
+    public function testSupprimerUnePageDeLEchantillon(): void
+    {
+        $client = $this->clientAuthentifie();
+        $id = $this->creerProjet($client);
+        $page = $client->request('POST', '/api/projets/'.$id.'/pages', ['json' => ['url' => 'https://exemple.fr/a', 'titre' => 'A']]);
+        /** @var array{pages: list<array{id: string}>} $projet */
+        $projet = $page->toArray();
+        $pageId = $projet['pages'][0]['id'];
+
+        $client->request('DELETE', '/api/projets/'.$id.'/pages/'.$pageId);
+        $this->assertResponseStatusCodeSame(204);
+
+        $reponse = $client->request('GET', '/api/projets/'.$id);
+        /** @var array{pages: list<mixed>} $apres */
+        $apres = $reponse->toArray();
+        self::assertCount(0, $apres['pages']);
+    }
+
     private function creerProjet(object $client): string
     {
         $reponse = $client->request('POST', '/api/projets', [

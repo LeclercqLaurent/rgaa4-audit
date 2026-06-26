@@ -24,6 +24,12 @@ class PageEntity
     ) {
     }
 
+    public function mettreAJour(string $url, string $titre): void
+    {
+        $this->url = $url;
+        $this->titre = $titre;
+    }
+
     public function getId(): string
     {
         return $this->id;

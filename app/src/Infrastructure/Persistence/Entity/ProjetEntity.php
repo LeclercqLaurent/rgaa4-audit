@@ -81,4 +81,9 @@ class ProjetEntity
             $this->pages->add($page);
         }
     }
+
+    public function removePage(PageEntity $page): void
+    {
+        $this->pages->removeElement($page);
+    }
 }

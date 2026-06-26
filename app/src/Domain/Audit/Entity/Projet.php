@@ -37,6 +37,19 @@ final class Projet
         $this->urlReference = $urlReference;
     }
 
+    public function supprimerPage(string $pageId): void
+    {
+        $this->pages = array_values(array_filter($this->pages, static fn (Page $p): bool => $p->id !== $pageId));
+    }
+
+    public function modifierPage(string $pageId, Url $url, string $titre): void
+    {
+        $this->pages = array_map(
+            static fn (Page $p): Page => $p->id === $pageId ? new Page($pageId, $url, $titre) : $p,
+            $this->pages,
+        );
+    }
+
     public function id(): string
     {
         return $this->id;

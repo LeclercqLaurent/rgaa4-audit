@@ -65,8 +65,21 @@ final readonly class DoctrineProjetRepository implements ProjetRepository
 
     private function synchroniserPages(Projet $projet, ProjetEntity $entity): void
     {
-        $existants = array_map(static fn (PageEntity $p): string => $p->getId(), $entity->getPages()->toArray());
+        $domaine = [];
+        foreach ($projet->pages() as $page) {
+            $domaine[$page->id] = $page;
+        }
 
+        foreach ($entity->getPages()->toArray() as $pageEntity) {
+            $page = $domaine[$pageEntity->getId()] ?? null;
+            if (null === $page) {
+                $entity->removePage($pageEntity);
+            } else {
+                $pageEntity->mettreAJour((string) $page->url, $page->titre);
+            }
+        }
+
+        $existants = array_map(static fn (PageEntity $p): string => $p->getId(), $entity->getPages()->toArray());
         foreach ($projet->pages() as $page) {
             if (!in_array($page->id, $existants, true)) {
                 $pageEntity = new PageEntity($page->id, (string) $page->url, $page->titre, $entity);

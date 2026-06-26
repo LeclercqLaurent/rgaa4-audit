@@ -193,6 +193,45 @@ th {
   color: var(--bleu);
 }
 
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.card {
+  flex: 1 1 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.card--principal {
+  background: var(--bleu);
+  color: #fff;
+  flex-basis: 200px;
+}
+
+.card__valeur {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.card__label {
+  font-size: 13px;
+  color: var(--gris);
+  text-align: center;
+}
+
+.card--principal .card__label {
+  color: #fff;
+}
+
 .visuellement-cache {
   position: absolute;
   width: 1px;
