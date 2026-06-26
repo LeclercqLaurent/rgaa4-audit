@@ -4,6 +4,7 @@ import {
   Statut,
   ouvrirRapport,
   useAjouterPage,
+  useConsommerScans,
   useConstats,
   useDefinirStatut,
   useLancerScan,
@@ -111,14 +112,23 @@ function PagesSection({ projetId, pages }: { projetId: string; pages: { id: stri
 function ScanSection({ projetId }: { projetId: string }) {
   const { data: scans } = useScans(projetId);
   const lancer = useLancerScan(projetId);
+  const consommer = useConsommerScans(projetId);
   const dernier = scans?.[0];
 
   return (
     <section className="carte" aria-labelledby="scan-titre">
       <h2 id="scan-titre">Scan automatique</h2>
-      <button className="bouton" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
-        Lancer un scan
-      </button>
+      <div className="actions">
+        <button className="bouton" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
+          Lancer un scan
+        </button>
+        <button className="bouton" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
+          {consommer.isPending ? 'Traitement…' : 'Traiter les scans en attente'}
+        </button>
+      </div>
+      {consommer.isSuccess && (
+        <p aria-live="polite">{consommer.data.traites} message(s) traité(s).</p>
+      )}
       {dernier && (
         <p aria-live="polite">
           Dernier scan : <strong>{dernier.statut}</strong> (

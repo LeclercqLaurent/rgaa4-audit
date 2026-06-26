@@ -274,6 +274,18 @@ export function useLancerScan(projetId: string) {
   });
 }
 
+export function useConsommerScans(projetId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => request<{ traites: number }>('/api/scans/consommer', { method: 'POST', body: '{}' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['scans', projetId] });
+      qc.invalidateQueries({ queryKey: ['constats', projetId] });
+      qc.invalidateQueries({ queryKey: ['taux', projetId] });
+    },
+  });
+}
+
 export function useDefinirStatut(projetId: string) {
   const qc = useQueryClient();
   return useMutation({
