@@ -8,8 +8,9 @@ use App\Domain\Audit\ValueObject\StatutConformite;
 use App\Domain\Audit\ValueObject\TauxConformite;
 
 /**
- * Rapport d'audit RGAA assemblé : métadonnées du projet, taux de conformité,
- * sections par thématique et, dérivé, le plan d'action (non-conformités).
+ * Rapport d'audit assemblé : métadonnées du projet, type d'audit, taux de
+ * conformité, sections (par thématique RGAA ou par lentille de complexité) et,
+ * dérivé, le plan d'action (non-conformités).
  */
 final readonly class Rapport
 {
@@ -19,7 +20,8 @@ final readonly class Rapport
     public function __construct(
         public string $projetNom,
         public string $client,
-        public string $urlReference,
+        public string $type,
+        public string $cible,
         public string $dateGeneration,
         public TauxConformite $taux,
         public array $sections,

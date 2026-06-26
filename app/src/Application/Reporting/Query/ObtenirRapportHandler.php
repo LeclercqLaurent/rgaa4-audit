@@ -14,6 +14,7 @@ use App\Domain\Audit\Entity\Constat;
 use App\Domain\Audit\Exception\ProjetIntrouvable;
 use App\Domain\Audit\Service\CalculateurTaux;
 use App\Domain\Audit\Service\ResolveurConstatsEffectifs;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\TauxConformite;
 use App\Domain\Referential\Entity\Thematique;
 use App\Domain\Reporting\ValueObject\LigneRapport;
@@ -28,6 +29,17 @@ use DateTimeInterface;
  */
 final readonly class ObtenirRapportHandler
 {
+    /**
+     * Libellés des lentilles de complexité (sections du rapport « Complexité PHP »).
+     */
+    private const LENTILLES = [
+        'cognitive' => 'Complexité cognitive (S3776)',
+        'params' => 'Nombre de paramètres (S107)',
+        'returns' => 'Points de sortie (S1142)',
+        'live_peak' => 'Pic de variables vivantes',
+        'entangle' => 'Intrication des variables',
+    ];
+
     public function __construct(
         private ObtenirProjetHandler $obtenirProjet,
         private ListerConstatsHandler $listerConstats,
@@ -52,20 +64,37 @@ final readonly class ObtenirRapportHandler
         return new Rapport(
             $projet->nom(),
             $projet->client(),
+            $projet->type()->value,
             $projet->cible(),
             (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
             $taux,
-            $this->sections($thematiques, $effectifs, $taux),
+            $this->sections($projet->type(), $thematiques, $effectifs, $taux),
         );
     }
 
     /**
-     * @param list<Thematique>      $thematiques
-     * @param list<Constat>         $effectifs
+     * Sections du rapport selon le référentiel du projet : par thématique (RGAA)
+     * ou par lentille de complexité.
+     *
+     * @param list<Thematique> $thematiques
+     * @param list<Constat>    $effectifs
      *
      * @return list<SectionThematique>
      */
-    private function sections(array $thematiques, array $effectifs, TauxConformite $taux): array
+    private function sections(Referentiel $type, array $thematiques, array $effectifs, TauxConformite $taux): array
+    {
+        return Referentiel::ComplexitePhp === $type
+            ? $this->sectionsComplexite($effectifs)
+            : $this->sectionsRgaa($thematiques, $effectifs, $taux);
+    }
+
+    /**
+     * @param list<Thematique> $thematiques
+     * @param list<Constat>    $effectifs
+     *
+     * @return list<SectionThematique>
+     */
+    private function sectionsRgaa(array $thematiques, array $effectifs, TauxConformite $taux): array
     {
         $intitules = $this->intitules($thematiques);
         $lignesParThematique = $this->lignesParThematique($effectifs, $intitules);
@@ -76,6 +105,36 @@ final readonly class ObtenirRapportHandler
             if ([] !== $lignes) {
                 $sections[] = new SectionThematique($thematique->numero, $thematique->nom, $lignes, $taux->parThematique[$thematique->numero] ?? null);
             }
+        }
+
+        return $sections;
+    }
+
+    /**
+     * @param list<Constat> $effectifs
+     *
+     * @return list<SectionThematique>
+     */
+    private function sectionsComplexite(array $effectifs): array
+    {
+        $parLentille = [];
+        foreach ($effectifs as $constat) {
+            $parLentille[$constat->critereNumero()][] = $constat;
+        }
+
+        $sections = [];
+        $numero = 1;
+        foreach (self::LENTILLES as $cle => $label) {
+            $constats = $parLentille[$cle] ?? [];
+            if ([] === $constats) {
+                continue;
+            }
+
+            $lignes = array_map(
+                static fn (Constat $c): LigneRapport => new LigneRapport($c->critereNumero(), $label, $c->uniteAuditee(), $c->statut(), $c->source(), $c->preuves()),
+                $constats,
+            );
+            $sections[] = new SectionThematique($numero++, $label, $lignes, $this->calculateur->calculer($constats)->global);
         }
 
         return $sections;

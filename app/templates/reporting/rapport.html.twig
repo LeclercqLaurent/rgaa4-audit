@@ -22,27 +22,29 @@
 <body>
     {% set libelles = {'conforme': 'Conforme', 'non_conforme': 'Non conforme', 'non_applicable': 'Non applicable', 'non_teste': 'Non testé'} %}
     {% set global = rapport.taux.global %}
+    {% set complexite = rapport.type == 'complexite_php' %}
+    {% set sujet = complexite ? 'le code' : 'le site' %}
 
-    <h1>Rapport d'audit d'accessibilité RGAA 4</h1>
+    <h1>{% if complexite %}Rapport d'audit de complexité PHP{% else %}Rapport d'audit d'accessibilité RGAA 4{% endif %}</h1>
 
     <table class="meta">
         <caption>Informations sur l'audit</caption>
         <tbody>
             <tr><td>Projet</td><td>{{ rapport.projetNom }}</td></tr>
             <tr><td>Client</td><td>{{ rapport.client }}</td></tr>
-            <tr><td>URL de référence</td><td>{{ rapport.urlReference }}</td></tr>
+            <tr><td>{{ complexite ? 'Chemin du code' : 'URL de référence' }}</td><td>{{ rapport.cible }}</td></tr>
             <tr><td>Date de génération</td><td>{{ rapport.dateGeneration }}</td></tr>
         </tbody>
     </table>
 
-    <h2>Déclaration d'accessibilité</h2>
+    <h2>{% if complexite %}Synthèse{% else %}Déclaration d'accessibilité{% endif %}</h2>
     <p>
-        Au regard des critères automatiquement évalués, le site est
+        Au regard des critères automatiquement évalués, {{ sujet }} est
         {% if global is null %}<strong>non évalué</strong> (aucun critère évaluable automatiquement)
         {% elseif global >= 1 %}<strong>totalement conforme</strong>
         {% elseif global > 0 %}<strong>partiellement conforme</strong>
         {% else %}<strong>non conforme</strong>{% endif %}
-        au RGAA 4.
+        {% if complexite %}aux seuils de complexité.{% else %}au RGAA 4.{% endif %}
     </p>
     <p class="taux">Taux de conformité : {% if global is null %}Non évalué{% else %}{{ (global * 100)|round(1) }} %{% endif %}</p>
     <p>
@@ -50,13 +52,13 @@
         {{ rapport.taux.nonApplicables }} non applicable(s), {{ rapport.taux.nonTestes }} non testé(s).
     </p>
 
-    {% if rapport.taux.parThematique is not empty %}
+    {% if rapport.sections is not empty %}
     <table>
-        <caption>Taux de conformité par thématique</caption>
-        <thead><tr><th scope="col">Thématique</th><th scope="col">Taux</th></tr></thead>
+        <caption>Taux de conformité par {{ complexite ? 'lentille' : 'thématique' }}</caption>
+        <thead><tr><th scope="col">{{ complexite ? 'Lentille' : 'Thématique' }}</th><th scope="col">Taux</th></tr></thead>
         <tbody>
-            {% for numero, taux in rapport.taux.parThematique %}
-            <tr><td>Thématique {{ numero }}</td><td>{{ (taux * 100)|round(1) }} %</td></tr>
+            {% for section in rapport.sections %}
+            <tr><td>{{ section.nom }}</td><td>{% if section.taux is null %}—{% else %}{{ (section.taux * 100)|round(1) }} %{% endif %}</td></tr>
             {% endfor %}
         </tbody>
     </table>
@@ -66,7 +68,7 @@
     {% for section in rapport.sections %}
     <h3>{{ section.numero }}. {{ section.nom }}{% if section.taux is not null %} — {{ (section.taux * 100)|round(1) }} %{% endif %}</h3>
     <table>
-        <caption>Constats de la thématique {{ section.nom }}</caption>
+        <caption>Constats de la section {{ section.nom }}</caption>
         <thead>
             <tr><th scope="col">Critère</th><th scope="col">Intitulé</th><th scope="col">Statut</th><th scope="col">Source</th></tr>
         </thead>

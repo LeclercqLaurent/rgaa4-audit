@@ -45,6 +45,24 @@ final class RapportApiTest extends ApiSecuriseeTestCase
         self::assertStringStartsWith('%PDF', $reponse->getContent());
     }
 
+    public function testRapportDeComplexiteEstStructureParLentille(): void
+    {
+        $client = $this->clientAuthentifie();
+        $data = $client->request('POST', '/api/projets', [
+            'json' => ['nom' => 'Projet complexité', 'client' => 'Interne', 'type' => 'complexite_php', 'cible' => '/opt/phpx/src'],
+        ])->toArray();
+        $projetId = is_string($data['id']) ? $data['id'] : '';
+        $client->request('POST', '/api/projets/'.$projetId.'/analyse', ['json' => (object) []]);
+
+        $reponse = $client->request('GET', '/api/projets/'.$projetId.'/rapport');
+
+        $this->assertResponseIsSuccessful();
+        $html = $reponse->getContent();
+        self::assertStringContainsString('Rapport d\'audit de complexité PHP', $html);
+        self::assertStringContainsString('Complexité cognitive (S3776)', $html);
+        self::assertStringContainsString('aux seuils de complexité', $html);
+    }
+
     public function testRapportProjetInconnuRenvoie404(): void
     {
         $this->clientAuthentifie()->request('GET', '/api/projets/019f0000-0000-7000-8000-000000000000/rapport');
