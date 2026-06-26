@@ -122,6 +122,33 @@ a {
   background: var(--rouge);
 }
 
+.bouton--petit {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+.barre-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cellule-edition input {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--bordure);
+  border-radius: 4px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

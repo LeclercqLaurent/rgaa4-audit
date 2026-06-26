@@ -32,26 +32,29 @@ describe('ProjetsPage', () => {
     vi.restoreAllMocks();
   });
 
-  it('affiche le titre, le formulaire et la liste des projets', async () => {
+  it('affiche le titre et la liste des projets en tableau', async () => {
     renderPage();
 
     expect(screen.getByRole('heading', { level: 1, name: /Projets d'audit RGAA/i })).toBeInTheDocument();
-    expect(screen.getByLabelText('Nom du projet')).toBeInTheDocument();
-    expect(screen.getByLabelText('Client')).toBeInTheDocument();
-    expect(screen.getByLabelText('URL de référence')).toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: /Mairie de Démo/ })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Mairie de Démo' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Modifier Mairie de Démo/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Supprimer Mairie de Démo/ })).toBeInTheDocument();
   });
 
-  it('saisit le formulaire de création', async () => {
+  it('ouvre le formulaire de création via le CTA', async () => {
     renderPage();
-    await userEvent.type(screen.getByLabelText('Nom du projet'), 'Nouveau');
+    await screen.findByRole('link', { name: 'Mairie de Démo' });
 
-    expect(screen.getByLabelText('Nom du projet')).toHaveValue('Nouveau');
+    expect(screen.queryByLabelText('Nom du projet')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /Nouveau projet/ }));
+
+    expect(screen.getByLabelText('Nom du projet')).toBeInTheDocument();
+    expect(screen.getByLabelText('URL de référence')).toBeInTheDocument();
   });
 
   it("ne présente aucune violation d'accessibilité", async () => {
     const { container } = renderPage();
-    await screen.findByRole('link', { name: /Mairie de Démo/ });
+    await screen.findByRole('link', { name: 'Mairie de Démo' });
 
     expect(await axe(container)).toHaveNoViolations();
   });

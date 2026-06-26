@@ -1,17 +1,14 @@
 import { FormEvent, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
-  Projet,
   Statut,
   rapportUrl,
   useAjouterPage,
   useConstats,
   useDefinirStatut,
   useLancerScan,
-  useModifierProjet,
   useProjet,
   useScans,
-  useSupprimerProjet,
   useTaux,
 } from '../api';
 
@@ -45,8 +42,6 @@ export default function ProjetPage() {
         {projet.client} — <a href={projet.urlReference}>{projet.urlReference}</a>
       </p>
 
-      <ProjetActions projet={projet} />
-
       <div className="grille grille--2">
         <PagesSection projetId={projetId} pages={projet.pages} />
         <ScanSection projetId={projetId} />
@@ -61,73 +56,6 @@ export default function ProjetPage() {
         <a href={rapportUrl(projetId, true)}>Télécharger le PDF</a>
       </p>
     </>
-  );
-}
-
-function ProjetActions({ projet }: { projet: Projet }) {
-  const navigate = useNavigate();
-  const modifier = useModifierProjet(projet.id);
-  const supprimer = useSupprimerProjet();
-  const [edition, setEdition] = useState(false);
-  const [nom, setNom] = useState(projet.nom);
-  const [client, setClient] = useState(projet.client);
-  const [urlReference, setUrlReference] = useState(projet.urlReference);
-
-  const ouvrirEdition = () => {
-    setNom(projet.nom);
-    setClient(projet.client);
-    setUrlReference(projet.urlReference);
-    setEdition(true);
-  };
-
-  const enregistrer = (event: FormEvent) => {
-    event.preventDefault();
-    modifier.mutate({ nom, client, urlReference }, { onSuccess: () => setEdition(false) });
-  };
-
-  const supprimerProjet = () => {
-    if (window.confirm('Supprimer ce projet et toutes ses données (pages, scans, constats) ?')) {
-      supprimer.mutate(projet.id, { onSuccess: () => navigate('/') });
-    }
-  };
-
-  if (!edition) {
-    return (
-      <p>
-        <button type="button" className="bouton" onClick={ouvrirEdition}>
-          Modifier
-        </button>{' '}
-        <button type="button" className="bouton bouton--danger" onClick={supprimerProjet} disabled={supprimer.isPending}>
-          Supprimer le projet
-        </button>
-      </p>
-    );
-  }
-
-  return (
-    <section className="carte" aria-labelledby="edit-titre">
-      <h2 id="edit-titre">Modifier le projet</h2>
-      <form onSubmit={enregistrer}>
-        <div className="champ">
-          <label htmlFor="edit-nom">Nom du projet</label>
-          <input id="edit-nom" required value={nom} onChange={(e) => setNom(e.target.value)} />
-        </div>
-        <div className="champ">
-          <label htmlFor="edit-client">Client</label>
-          <input id="edit-client" required value={client} onChange={(e) => setClient(e.target.value)} />
-        </div>
-        <div className="champ">
-          <label htmlFor="edit-url">URL de référence</label>
-          <input id="edit-url" type="url" required value={urlReference} onChange={(e) => setUrlReference(e.target.value)} />
-        </div>
-        <button className="bouton" type="submit" disabled={modifier.isPending}>
-          Enregistrer
-        </button>{' '}
-        <button type="button" className="bouton" onClick={() => setEdition(false)}>
-          Annuler
-        </button>
-      </form>
-    </section>
   );
 }
 
