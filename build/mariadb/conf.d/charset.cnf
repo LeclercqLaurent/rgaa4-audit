@@ -1,0 +1,8 @@
+[mysqld]
+character-set-server = utf8mb4
+# Collation Unicode moderne (UCA 14.0.0), accent- et casse-insensible : tri/recherche
+# FR corrects. Les colonnes « code » (PK/FK) sont en ascii_bin via le mapping Doctrine.
+collation-server = utf8mb4_uca1400_ai_ci
+
+[client]
+default-character-set = utf8mb4

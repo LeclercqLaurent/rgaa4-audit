@@ -1,0 +1,417 @@
+# Correspondance WCAG SC -> critères RGAA (dérivée du référentiel).
+# axe_tag : tag axe-core du critère de succès (jointure axe-core → WCAG → RGAA).
+# Données dérivées : ne pas éditer à la main. Régénérer via : python3 scripts/build-wcag-rgaa-mapping.py
+referentiel: RGAA
+version: 4.1.2
+wcag: '2.1'
+source: app/fixtures/rgaa/criteres.yaml
+criteres_succes:
+- wcag: 1.1.1
+  intitule: Non-text Content
+  niveau: A
+  axe_tag: wcag111
+  criteres_rgaa:
+  - '1.1'
+  - '1.2'
+  - '1.3'
+  - '1.4'
+  - '1.5'
+  - '1.6'
+  - '1.7'
+  - '1.9'
+  - '4.7'
+  - '4.8'
+  - '4.9'
+  - '6.1'
+  - '6.2'
+  - '7.2'
+  - '10.2'
+  - '13.3'
+  - '13.4'
+  - '13.5'
+  - '13.6'
+- wcag: 1.2.1
+  intitule: Audio-only and Video-only (Prerecorded)
+  niveau: A
+  axe_tag: wcag121
+  criteres_rgaa:
+  - '4.1'
+  - '4.2'
+- wcag: 1.2.2
+  intitule: Captions (Prerecorded)
+  niveau: A
+  axe_tag: wcag122
+  criteres_rgaa:
+  - '4.3'
+  - '4.4'
+- wcag: 1.2.3
+  intitule: Audio Description or Media Alternative (Prerecorded)
+  niveau: A
+  axe_tag: wcag123
+  criteres_rgaa:
+  - '4.1'
+  - '4.2'
+- wcag: 1.2.5
+  intitule: Audio Description (Prerecorded)
+  niveau: AA
+  axe_tag: wcag125
+  criteres_rgaa:
+  - '4.5'
+  - '4.6'
+- wcag: 1.3.1
+  intitule: Info and Relationships
+  niveau: A
+  axe_tag: wcag131
+  criteres_rgaa:
+  - '3.1'
+  - '5.1'
+  - '5.2'
+  - '5.4'
+  - '5.5'
+  - '5.6'
+  - '5.7'
+  - '5.8'
+  - '7.3'
+  - '8.9'
+  - '9.1'
+  - '9.2'
+  - '9.3'
+  - '9.4'
+  - '10.1'
+  - '10.2'
+  - '11.1'
+  - '11.5'
+  - '11.6'
+  - '11.7'
+  - '11.8'
+  - '12.6'
+  - '13.3'
+  - '13.4'
+- wcag: 1.3.2
+  intitule: Meaningful Sequence
+  niveau: A
+  axe_tag: wcag132
+  criteres_rgaa:
+  - '5.3'
+  - '8.10'
+  - '10.1'
+  - '10.3'
+  - '10.8'
+  - '13.3'
+  - '13.4'
+- wcag: 1.3.3
+  intitule: Sensory Characteristics
+  niveau: A
+  axe_tag: wcag133
+  criteres_rgaa:
+  - '10.9'
+  - '10.10'
+- wcag: 1.3.4
+  intitule: Orientation
+  niveau: AA
+  axe_tag: wcag134
+  criteres_rgaa:
+  - '13.9'
+- wcag: 1.3.5
+  intitule: Identify Input Purpose
+  niveau: AA
+  axe_tag: wcag135
+  criteres_rgaa:
+  - '11.13'
+- wcag: 1.4.1
+  intitule: Use of color
+  niveau: A
+  axe_tag: wcag141
+  criteres_rgaa:
+  - '3.1'
+  - '10.6'
+  - '10.7'
+  - '10.9'
+  - '10.10'
+- wcag: 1.4.2
+  intitule: Audio Control
+  niveau: A
+  axe_tag: wcag142
+  criteres_rgaa:
+  - '4.10'
+- wcag: 1.4.3
+  intitule: Contrast (Minimum)
+  niveau: AA
+  axe_tag: wcag143
+  criteres_rgaa:
+  - '3.2'
+  - '10.5'
+- wcag: 1.4.4
+  intitule: Resize Text
+  niveau: AA
+  axe_tag: wcag144
+  criteres_rgaa:
+  - '10.4'
+- wcag: 1.4.5
+  intitule: Images of Text
+  niveau: AA
+  axe_tag: wcag145
+  criteres_rgaa:
+  - '1.8'
+- wcag: 1.4.10
+  intitule: Reflow
+  niveau: AA
+  axe_tag: wcag1410
+  criteres_rgaa:
+  - '10.11'
+- wcag: 1.4.11
+  intitule: Non-text Contrast
+  niveau: AA
+  axe_tag: wcag1411
+  criteres_rgaa:
+  - '3.3'
+- wcag: 1.4.12
+  intitule: Text Spacing
+  niveau: AA
+  axe_tag: wcag1412
+  criteres_rgaa:
+  - '10.12'
+- wcag: 1.4.13
+  intitule: Content on Hover or Focus
+  niveau: AA
+  axe_tag: wcag1413
+  criteres_rgaa:
+  - '10.13'
+- wcag: 2.1.1
+  intitule: Keyboard
+  niveau: A
+  axe_tag: wcag211
+  criteres_rgaa:
+  - '4.11'
+  - '4.12'
+  - '7.3'
+  - '10.14'
+  - '12.9'
+  - '12.11'
+- wcag: 2.1.2
+  intitule: No Keyboard Trap
+  niveau: A
+  axe_tag: wcag212
+  criteres_rgaa:
+  - '4.11'
+  - '4.12'
+  - '12.9'
+- wcag: 2.1.4
+  intitule: Character Key Shortcuts
+  niveau: A
+  axe_tag: wcag214
+  criteres_rgaa:
+  - '12.10'
+- wcag: 2.2.1
+  intitule: Timing Adjustable
+  niveau: A
+  axe_tag: wcag221
+  criteres_rgaa:
+  - '13.1'
+  - '13.8'
+- wcag: 2.2.2
+  intitule: Pause, Stop, Hide
+  niveau: A
+  axe_tag: wcag222
+  criteres_rgaa:
+  - '13.1'
+  - '13.8'
+- wcag: 2.3.1
+  intitule: Three Flashes or Below Threshold
+  niveau: A
+  axe_tag: wcag231
+  criteres_rgaa:
+  - '13.7'
+- wcag: 2.4.1
+  intitule: Bypass Blocks
+  niveau: A
+  axe_tag: wcag241
+  criteres_rgaa:
+  - '9.1'
+  - '12.6'
+  - '12.7'
+  - '13.3'
+  - '13.4'
+- wcag: 2.4.2
+  intitule: Page Titled
+  niveau: A
+  axe_tag: wcag242
+  criteres_rgaa:
+  - '8.5'
+  - '8.6'
+- wcag: 2.4.3
+  intitule: Focus Order
+  niveau: A
+  axe_tag: wcag243
+  criteres_rgaa:
+  - '10.3'
+  - '12.7'
+  - '12.8'
+  - '13.3'
+  - '13.4'
+- wcag: 2.4.4
+  intitule: Link Purpose (In Context)
+  niveau: A
+  axe_tag: wcag244
+  criteres_rgaa:
+  - '6.1'
+  - '6.2'
+- wcag: 2.4.5
+  intitule: Multiple Ways
+  niveau: AA
+  axe_tag: wcag245
+  criteres_rgaa:
+  - '12.1'
+  - '12.3'
+  - '12.4'
+- wcag: 2.4.6
+  intitule: Headings and Labels
+  niveau: AA
+  axe_tag: wcag246
+  criteres_rgaa:
+  - '9.1'
+  - '11.1'
+  - '11.2'
+- wcag: 2.4.7
+  intitule: Focus Visible
+  niveau: AA
+  axe_tag: wcag247
+  criteres_rgaa:
+  - '7.3'
+  - '10.7'
+- wcag: 2.5.1
+  intitule: Pointer Gestures
+  niveau: A
+  axe_tag: wcag251
+  criteres_rgaa:
+  - '13.10'
+- wcag: 2.5.2
+  intitule: Pointer Cancellation
+  niveau: A
+  axe_tag: wcag252
+  criteres_rgaa:
+  - '13.11'
+- wcag: 2.5.3
+  intitule: Label in Name
+  niveau: A
+  axe_tag: wcag253
+  criteres_rgaa:
+  - '6.1'
+  - '7.1'
+  - '11.2'
+  - '11.9'
+- wcag: 2.5.4
+  intitule: Motion Actuation
+  niveau: A
+  axe_tag: wcag254
+  criteres_rgaa:
+  - '13.12'
+- wcag: 3.1.1
+  intitule: Language of Page
+  niveau: A
+  axe_tag: wcag311
+  criteres_rgaa:
+  - '8.3'
+  - '8.4'
+  - '13.3'
+  - '13.4'
+- wcag: 3.1.2
+  intitule: Language of Parts
+  niveau: AA
+  axe_tag: wcag312
+  criteres_rgaa:
+  - '8.7'
+  - '8.8'
+- wcag: 3.2.1
+  intitule: On Focus
+  niveau: A
+  axe_tag: wcag321
+  criteres_rgaa:
+  - '7.4'
+  - '13.2'
+- wcag: 3.2.2
+  intitule: On Input
+  niveau: A
+  axe_tag: wcag322
+  criteres_rgaa:
+  - '7.4'
+- wcag: 3.2.3
+  intitule: Consistent Navigation
+  niveau: AA
+  axe_tag: wcag323
+  criteres_rgaa:
+  - '12.2'
+  - '12.4'
+  - '12.5'
+  - '12.7'
+- wcag: 3.2.4
+  intitule: Consistent Identification
+  niveau: AA
+  axe_tag: wcag324
+  criteres_rgaa:
+  - '11.3'
+- wcag: 3.3.1
+  intitule: Error Identification
+  niveau: A
+  axe_tag: wcag331
+  criteres_rgaa:
+  - '11.10'
+- wcag: 3.3.2
+  intitule: Labels or Instructions
+  niveau: A
+  axe_tag: wcag332
+  criteres_rgaa:
+  - '11.1'
+  - '11.2'
+  - '11.4'
+  - '11.5'
+  - '11.6'
+  - '11.7'
+  - '11.10'
+- wcag: 3.3.3
+  intitule: Error Suggestion
+  niveau: AA
+  axe_tag: wcag333
+  criteres_rgaa:
+  - '11.11'
+- wcag: 3.3.4
+  intitule: Error Prevention (Legal, Financial, Data)
+  niveau: AA
+  axe_tag: wcag334
+  criteres_rgaa:
+  - '11.12'
+- wcag: 4.1.1
+  intitule: Parsing
+  niveau: A
+  axe_tag: wcag411
+  criteres_rgaa:
+  - '8.1'
+  - '8.2'
+- wcag: 4.1.2
+  intitule: Name, Role, Value
+  niveau: A
+  axe_tag: wcag412
+  criteres_rgaa:
+  - '1.2'
+  - '1.3'
+  - '1.9'
+  - '2.1'
+  - '2.2'
+  - '4.13'
+  - '5.3'
+  - '7.1'
+  - '7.2'
+  - '8.2'
+  - '9.1'
+  - '10.8'
+  - '11.1'
+  - '11.9'
+  - '12.6'
+  - '13.3'
+  - '13.4'
+- wcag: 4.1.3
+  intitule: Status Messages
+  niveau: AA
+  axe_tag: wcag413
+  criteres_rgaa:
+  - '7.5'

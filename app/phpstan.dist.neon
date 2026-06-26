@@ -1,0 +1,18 @@
+includes:
+    - tools/phpstan/rules.neon
+    # Faux positifs hérités du squelette (ex. getAllowedEnvs() appelé par le runtime
+    # Symfony). À garder minimal ; tout nouveau code doit passer sans baseline.
+    - phpstan-baseline.neon
+
+parameters:
+    level: 9
+    paths:
+        - src
+        - tools/phpstan/src
+    # Complexité cognitive (Sonar S3776) — extension tomasvotruba/cognitive-complexity
+    cognitive_complexity:
+        class: 50
+        function: 15
+    # Extension phpstan-symfony : analyse du conteneur (cache dev réchauffé par scripts/qa.sh)
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml

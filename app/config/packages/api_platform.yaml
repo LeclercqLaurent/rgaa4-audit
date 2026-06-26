@@ -1,0 +1,15 @@
+api_platform:
+    title: RGAA 4 Audit API
+    version: 1.0.0
+    # Resources API exposées sous forme de DTO (hexagonal : ni le Domain ni la
+    # persistence ne sont exposés directement).
+    mapping:
+        paths:
+            - '%kernel.project_dir%/src/ApiResource'
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']

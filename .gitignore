@@ -1,0 +1,12 @@
+# Cache Composer confiné dans le projet (cf. règle de périmètre)
+/.composer/
+
+# Scaffolding temporaire
+/.scaffold/
+
+# Service de scan Node
+/scanner/node_modules/
+
+# OS
+.DS_Store
+docker-compose.override.yaml

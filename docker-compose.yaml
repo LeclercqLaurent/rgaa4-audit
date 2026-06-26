@@ -1,0 +1,61 @@
+services:
+  www:
+    build:
+      context: .
+      dockerfile: build/php/Dockerfile
+    container_name: www_rgaa
+    volumes:
+      - ./app:/var/www/app
+      - ./build/vhosts:/etc/apache2/sites-enabled:ro
+    ports:
+      - "8081:80"   # 8080 réservé par un autre projet (Bien-Esti) ; cf. CLAUDE.md
+    depends_on:
+      - db
+      - mail
+    networks:
+      - rgaa
+
+  db:
+    image: mariadb:11.4
+    container_name: db_rgaa
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: rgaa_dev
+    ports:
+      - "3309:3306"   # 3308 réservé par un autre projet
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./build/mariadb/conf.d:/etc/mysql/conf.d:ro
+    networks:
+      - rgaa
+
+  mail:
+    image: axllent/mailpit:latest
+    container_name: mail_rgaa
+    ports:
+      - "1026:1025"   # 1025 réservé par un autre projet
+      - "8026:8025"   # 8025 réservé par un autre projet
+    networks:
+      - rgaa
+
+  # Service de scan a11y (Puppeteer + axe-core). Node 24 en conteneur dédié.
+  # L'interface (CLI invoqué par Symfony Process vs microservice HTTP) reste à
+  # trancher — voir CLAUDE.md « Décisions ouvertes ». La command sera définie une
+  # fois le code du scanner écrit ; pour l'instant le conteneur reste disponible.
+  scanner:
+    build:
+      context: .
+      dockerfile: build/node/Dockerfile
+    container_name: scanner_rgaa
+    volumes:
+      - ./scanner:/scanner
+    working_dir: /scanner
+    command: ["sleep", "infinity"]
+    networks:
+      - rgaa
+
+volumes:
+  db_data:
+
+networks:
+  rgaa:

@@ -1,0 +1,11 @@
+services:
+    -
+        class: Rgaa\PhpStan\TooManyReturnStatementsRule
+        tags: [phpstan.rules.rule]
+        arguments:
+            maxReturns: 3
+    -
+        class: Rgaa\PhpStan\TooManyParametersRule
+        tags: [phpstan.rules.rule]
+        arguments:
+            maxParameters: 7
