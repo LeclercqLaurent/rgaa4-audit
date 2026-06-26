@@ -59,6 +59,13 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
         return array_map($this->toDomain(...), $entities);
     }
 
+    public function supprimerPourProjet(string $projetId): void
+    {
+        $this->em->createQuery(sprintf('DELETE FROM %s c WHERE c.projetId = :projet', ConstatEntity::class))
+            ->setParameter('projet', $projetId)
+            ->execute();
+    }
+
     private function toEntity(Constat $constat): ConstatEntity
     {
         $entity = new ConstatEntity(

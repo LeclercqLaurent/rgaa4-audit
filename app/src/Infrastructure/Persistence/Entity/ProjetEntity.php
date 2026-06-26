@@ -16,7 +16,7 @@ class ProjetEntity
     /**
      * @var Collection<int, PageEntity>
      */
-    #[ORM\OneToMany(targetEntity: PageEntity::class, mappedBy: 'projet', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: PageEntity::class, mappedBy: 'projet', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $pages;
 
     public function __construct(
@@ -33,6 +33,13 @@ class ProjetEntity
         private DateTimeImmutable $dateCreation,
     ) {
         $this->pages = new ArrayCollection();
+    }
+
+    public function mettreAJour(string $nom, string $client, string $urlReference): void
+    {
+        $this->nom = $nom;
+        $this->client = $client;
+        $this->urlReference = $urlReference;
     }
 
     public function getId(): string

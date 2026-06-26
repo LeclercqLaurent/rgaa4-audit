@@ -30,6 +30,13 @@ final class Projet
         $this->pages[] = $page;
     }
 
+    public function modifier(string $nom, string $client, Url $urlReference): void
+    {
+        $this->nom = $nom;
+        $this->client = $client;
+        $this->urlReference = $urlReference;
+    }
+
     public function id(): string
     {
         return $this->id;

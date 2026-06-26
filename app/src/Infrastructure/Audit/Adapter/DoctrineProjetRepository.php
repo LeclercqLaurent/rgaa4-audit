@@ -31,10 +31,22 @@ final readonly class DoctrineProjetRepository implements ProjetRepository
                 $projet->dateCreation(),
             );
             $this->em->persist($entity);
+        } else {
+            $entity->mettreAJour($projet->nom(), $projet->client(), (string) $projet->urlReference());
         }
 
         $this->synchroniserPages($projet, $entity);
         $this->em->flush();
+    }
+
+    public function supprimer(string $id): void
+    {
+        $entity = $this->em->getRepository(ProjetEntity::class)->find($id);
+
+        if ($entity instanceof ProjetEntity) {
+            $this->em->remove($entity);
+            $this->em->flush();
+        }
     }
 
     public function findAll(): array

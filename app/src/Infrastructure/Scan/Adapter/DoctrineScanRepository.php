@@ -47,6 +47,13 @@ final readonly class DoctrineScanRepository implements ScanRepository
         return array_map($this->toDomain(...), $entities);
     }
 
+    public function supprimerPourProjet(string $projetId): void
+    {
+        $this->em->createQuery(sprintf('DELETE FROM %s s WHERE s.projetId = :projet', ScanEntity::class))
+            ->setParameter('projet', $projetId)
+            ->execute();
+    }
+
     /**
      * @return list<array<string, mixed>>
      */

@@ -204,6 +204,30 @@ export function useCreerProjet() {
   });
 }
 
+export function useModifierProjet(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { nom: string; client: string; urlReference: string }) =>
+      request<Projet>(`/api/projets/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/merge-patch+json' },
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['projet', id] });
+      qc.invalidateQueries({ queryKey: ['projets'] });
+    },
+  });
+}
+
+export function useSupprimerProjet() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => request<void>(`/api/projets/${id}`, { method: 'DELETE' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['projets'] }),
+  });
+}
+
 export function useAjouterPage(projetId: string) {
   const qc = useQueryClient();
   return useMutation({

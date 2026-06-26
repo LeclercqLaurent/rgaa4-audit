@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Api\Audit;
 
+use App\Infrastructure\Persistence\Entity\ScanEntity;
 use App\Tests\Api\ApiSecuriseeTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Spécification d'acceptation du contexte Audit (Lot A1) : création de projet
@@ -82,6 +84,45 @@ final class ProjetApiTest extends ApiSecuriseeTestCase
         $this->clientAuthentifie()->request('POST', '/api/projets/019f0000-0000-7000-8000-000000000000/pages', [
             'json' => ['url' => 'https://exemple.fr/x', 'titre' => 'X'],
         ]);
+
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testModifierUnProjet(): void
+    {
+        $client = $this->clientAuthentifie();
+        $id = $this->creerProjet($client);
+
+        $client->request('PATCH', '/api/projets/'.$id, [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'body' => json_encode(['nom' => 'Audit renommé', 'client' => 'Nouveau client', 'urlReference' => 'https://exemple.fr']),
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains(['id' => $id, 'nom' => 'Audit renommé', 'client' => 'Nouveau client']);
+    }
+
+    public function testSupprimerUnProjetEtSesDonnees(): void
+    {
+        $client = $this->clientAuthentifie();
+        $id = $this->creerProjet($client);
+        $client->request('POST', '/api/projets/'.$id.'/pages', ['json' => ['url' => 'https://exemple.fr/a', 'titre' => 'A']]);
+        $client->request('POST', '/api/projets/'.$id.'/scans', ['json' => (object) []]);
+
+        $client->request('DELETE', '/api/projets/'.$id);
+        $this->assertResponseStatusCodeSame(204);
+
+        $client->request('GET', '/api/projets/'.$id);
+        $this->assertResponseStatusCodeSame(404);
+
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $scansRestants = $em->getRepository(ScanEntity::class)->count(['projetId' => $id]);
+        self::assertSame(0, $scansRestants, 'Les scans du projet doivent être supprimés en cascade.');
+    }
+
+    public function testSupprimerUnProjetInconnuRenvoie404(): void
+    {
+        $this->clientAuthentifie()->request('DELETE', '/api/projets/019f0000-0000-7000-8000-000000000000');
 
         $this->assertResponseStatusCodeSame(404);
     }

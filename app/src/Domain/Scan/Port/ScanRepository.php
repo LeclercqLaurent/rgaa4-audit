@@ -16,4 +16,6 @@ interface ScanRepository
      * @return list<Scan>
      */
     public function findByProjet(string $projetId): array;
+
+    public function supprimerPourProjet(string $projetId): void;
 }

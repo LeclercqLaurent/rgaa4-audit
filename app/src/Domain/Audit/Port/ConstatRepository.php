@@ -25,4 +25,6 @@ interface ConstatRepository
      * @return list<Constat>
      */
     public function findByProjet(string $projetId): array;
+
+    public function supprimerPourProjet(string $projetId): void;
 }

@@ -16,4 +16,6 @@ interface ProjetRepository
     public function findAll(): array;
 
     public function get(string $id): ?Projet;
+
+    public function supprimer(string $id): void;
 }
