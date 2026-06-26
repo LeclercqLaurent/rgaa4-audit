@@ -51,7 +51,9 @@ export default function ProjetsPage() {
                 <th scope="col">URL de référence</th>
                 <th scope="col">Pages</th>
                 <th scope="col">Dernier scan</th>
-                <th scope="col">Actions</th>
+                <th scope="col" colSpan={4}>
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -147,7 +149,7 @@ function LigneProjet({ projet }: { projet: Projet }) {
         <td>
           <ResumeScan scan={projet.dernierScan} />
         </td>
-        <td>
+        <td colSpan={4}>
           <div className="actions">
             <button type="button" className="btn btn-sm" onClick={enregistrer} disabled={modifier.isPending}>
               Enregistrer
@@ -172,29 +174,33 @@ function LigneProjet({ projet }: { projet: Projet }) {
       <td>
         <ResumeScan scan={projet.dernierScan} />
       </td>
-      <td>
-        <div className="actions">
-          <Link className="btn btn-sm btn-secondary" to={`/projets/${projet.id}`}>
-            Ouvrir
-          </Link>
-          {projet.dernierScan?.statut === 'done' && (
-            <button type="button" className="btn btn-sm btn-secondary" onClick={() => void ouvrirRapport(projet.id, true)} aria-label={`Rapport PDF de ${projet.nom}`}>
-              PDF
-            </button>
-          )}
-          <button type="button" className="btn btn-sm btn-secondary" onClick={ouvrirEdition} aria-label={`Modifier ${projet.nom}`}>
-            Modifier
+      <td className="pr-1">
+        <Link className="btn btn-sm btn-secondary w-full" to={`/projets/${projet.id}`}>
+          Ouvrir
+        </Link>
+      </td>
+      <td className="px-1">
+        {projet.dernierScan?.statut === 'done' && (
+          <button type="button" className="btn btn-sm btn-secondary w-full" onClick={() => void ouvrirRapport(projet.id, true)} aria-label={`Rapport PDF de ${projet.nom}`}>
+            PDF
           </button>
-          <button
-            type="button"
-            className="btn btn-sm btn-danger"
-            onClick={supprimerProjet}
-            disabled={supprimer.isPending}
-            aria-label={`Supprimer ${projet.nom}`}
-          >
-            Supprimer
-          </button>
-        </div>
+        )}
+      </td>
+      <td className="px-1">
+        <button type="button" className="btn btn-sm btn-secondary w-full" onClick={ouvrirEdition} aria-label={`Modifier ${projet.nom}`}>
+          Modifier
+        </button>
+      </td>
+      <td className="pl-1">
+        <button
+          type="button"
+          className="btn btn-sm btn-danger w-full"
+          onClick={supprimerProjet}
+          disabled={supprimer.isPending}
+          aria-label={`Supprimer ${projet.nom}`}
+        >
+          Supprimer
+        </button>
       </td>
     </tr>
   );
