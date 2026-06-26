@@ -10,6 +10,7 @@ use App\Application\Referential\Query\ObtenirMappingAxeHandler;
 use App\Application\Scan\Query\ListerScansProjet;
 use App\Application\Scan\Query\ListerScansProjetHandler;
 use App\Domain\Audit\Port\ConstatRepository;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Scan\Entity\Scan;
 use App\Domain\Scan\ValueObject\StatutScan;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -38,7 +39,7 @@ final readonly class GenererConstatsHandler
 
         $mapping = ($this->mapping)(new ObtenirMappingAxe());
         $constats = $this->generateur->pour($message->projetId, $scan->resultats(), $mapping);
-        $this->constats->remplacerAuto($message->projetId, $constats);
+        $this->constats->remplacerAuto($message->projetId, Referentiel::Rgaa, $constats);
     }
 
     private function dernierScanTermine(string $projetId): ?Scan

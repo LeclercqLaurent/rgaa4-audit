@@ -6,6 +6,7 @@ namespace App\Application\Audit\Service;
 
 use App\Domain\Audit\Entity\Constat;
 use App\Domain\Audit\ValueObject\Preuve;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\SourceConstat;
 use App\Domain\Audit\ValueObject\StatutConformite;
 use App\Domain\Scan\ValueObject\ResultatComplexite;
@@ -13,21 +14,10 @@ use App\Domain\Scan\ValueObject\ResultatComplexite;
 /**
  * 2ᵉ moteur : transforme un résultat phpx-complexity en constats par
  * (méthode, lentille) — conforme si la mesure est sous le seuil, sinon non
- * conforme.
- *
- * Écart Phase B : `critere_numero` étant en VARCHAR(8) (codes RGAA), on mappe
- * les lentilles vers des codes courts (cognitive→cog, live_peak→liv, …).
+ * conforme. Les constats relèvent du référentiel « Complexité PHP ».
  */
 final readonly class GenerateurConstatsComplexite
 {
-    private const CODES = [
-        'cognitive' => 'cog',
-        'params' => 'par',
-        'returns' => 'ret',
-        'live_peak' => 'liv',
-        'entangle' => 'ent',
-    ];
-
     /**
      * @return list<Constat>
      */
@@ -41,8 +31,9 @@ final readonly class GenerateurConstatsComplexite
 
                 $constats[] = new Constat(
                     $projetId,
+                    Referentiel::ComplexitePhp,
                     $methode->reference(),
-                    self::CODES[$lentille] ?? substr($lentille, 0, 8),
+                    $lentille,
                     $depasse ? StatutConformite::NonConforme : StatutConformite::Conforme,
                     SourceConstat::Auto,
                     $depasse ? [$this->preuve($lentille, $methode->reference(), $valeur, $seuil)] : [],

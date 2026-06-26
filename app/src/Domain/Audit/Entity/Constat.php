@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Audit\Entity;
 
 use App\Domain\Audit\ValueObject\Preuve;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\SourceConstat;
 use App\Domain\Audit\ValueObject\StatutConformite;
 
@@ -16,23 +17,37 @@ use App\Domain\Audit\ValueObject\StatutConformite;
  */
 final class Constat
 {
+    private ?string $commentaire = null;
+
     /**
      * @param list<Preuve> $preuves
      */
     public function __construct(
         private readonly string $projetId,
+        private readonly Referentiel $referentiel,
         private readonly string $pageUrl,
         private readonly string $critereNumero,
         private StatutConformite $statut,
         private SourceConstat $source,
         private array $preuves = [],
-        private ?string $commentaire = null,
     ) {
+    }
+
+    public function avecCommentaire(?string $commentaire): self
+    {
+        $this->commentaire = $commentaire;
+
+        return $this;
     }
 
     public function projetId(): string
     {
         return $this->projetId;
+    }
+
+    public function referentiel(): Referentiel
+    {
+        return $this->referentiel;
     }
 
     public function pageUrl(): string

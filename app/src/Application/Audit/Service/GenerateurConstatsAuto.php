@@ -6,6 +6,7 @@ namespace App\Application\Audit\Service;
 
 use App\Domain\Audit\Entity\Constat;
 use App\Domain\Audit\ValueObject\Preuve;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\SourceConstat;
 use App\Domain\Audit\ValueObject\StatutConformite;
 use App\Domain\Scan\ValueObject\NoeudAxe;
@@ -53,6 +54,7 @@ final readonly class GenerateurConstatsAuto
         return array_map(
             fn (string $critere): Constat => new Constat(
                 $projetId,
+                Referentiel::Rgaa,
                 $page->url,
                 $critere,
                 isset($preuvesParCritere[$critere]) ? StatutConformite::NonConforme : StatutConformite::Conforme,

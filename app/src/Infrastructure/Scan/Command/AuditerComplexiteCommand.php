@@ -8,6 +8,7 @@ use App\Application\Audit\Query\ObtenirProjet;
 use App\Application\Audit\Query\ObtenirProjetHandler;
 use App\Application\Audit\Service\GenerateurConstatsComplexite;
 use App\Domain\Audit\Port\ConstatRepository;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Scan\Port\AnalyseurCode;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -56,7 +57,7 @@ final class AuditerComplexiteCommand extends Command
 
         $resultat = $this->analyseur->analyser($chemin);
         $constats = $this->generateur->pour($projetId, $resultat);
-        $this->constats->remplacerAuto($projetId, $constats);
+        $this->constats->remplacerAuto($projetId, Referentiel::ComplexitePhp, $constats);
 
         $nonConformes = count(array_filter($constats, static fn ($c): bool => $c->statut()->value === 'non_conforme'));
         $io->success(sprintf('%d méthode(s) analysée(s), %d constat(s) (%d non conformes).', count($resultat->methodes), count($constats), $nonConformes));

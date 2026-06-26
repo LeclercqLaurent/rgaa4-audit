@@ -25,14 +25,13 @@ final readonly class DefinirStatutCritereHandler
             throw ProjetIntrouvable::pour($command->projetId);
         }
 
-        $this->constats->enregistrerManuel(new Constat(
+        $this->constats->enregistrerManuel((new Constat(
             $command->projetId,
+            $command->referentiel,
             $command->pageUrl,
             $command->critereNumero,
             $command->statut,
             SourceConstat::Manuel,
-            [],
-            $command->commentaire,
-        ));
+        ))->avecCommentaire($command->commentaire));
     }
 }

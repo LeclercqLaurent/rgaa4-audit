@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Audit\Command;
 
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\StatutConformite;
 
 /**
@@ -17,6 +18,7 @@ final readonly class DefinirStatutCritere
         public string $critereNumero,
         public StatutConformite $statut,
         public ?string $commentaire = null,
+        public Referentiel $referentiel = Referentiel::Rgaa,
     ) {
     }
 }

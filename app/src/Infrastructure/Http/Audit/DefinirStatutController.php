@@ -7,6 +7,7 @@ namespace App\Infrastructure\Http\Audit;
 use App\Application\Audit\Command\DefinirStatutCritere;
 use App\Application\Audit\Command\DefinirStatutCritereHandler;
 use App\Domain\Audit\Exception\ProjetIntrouvable;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\StatutConformite;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,13 +31,14 @@ final readonly class DefinirStatutController
         $critere = is_string($payload['critereNumero'] ?? null) ? $payload['critereNumero'] : '';
         $statut = StatutConformite::tryFrom(is_string($payload['statut'] ?? null) ? $payload['statut'] : '');
         $commentaire = is_string($payload['commentaire'] ?? null) ? $payload['commentaire'] : null;
+        $referentiel = Referentiel::tryFrom(is_string($payload['referentiel'] ?? null) ? $payload['referentiel'] : '') ?? Referentiel::Rgaa;
 
         if ('' === $pageUrl || '' === $critere || null === $statut) {
             return new JsonResponse(['error' => 'Champs requis : pageUrl, critereNumero, statut (valeur valide).'], 400);
         }
 
         try {
-            ($this->definir)(new DefinirStatutCritere($projetId, $pageUrl, $critere, $statut, $commentaire));
+            ($this->definir)(new DefinirStatutCritere($projetId, $pageUrl, $critere, $statut, $commentaire, $referentiel));
         } catch (ProjetIntrouvable $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }

@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Domain\Audit\Service;
 
 use App\Domain\Audit\Entity\Constat;
 use App\Domain\Audit\Service\ResolveurConstatsEffectifs;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\SourceConstat;
 use App\Domain\Audit\ValueObject\StatutConformite;
 use PHPUnit\Framework\TestCase;
@@ -15,9 +16,9 @@ final class ResolveurConstatsEffectifsTest extends TestCase
     public function testLeConstatManuelPrimeSurLAuto(): void
     {
         $effectifs = (new ResolveurConstatsEffectifs())->resoudre([
-            new Constat('p', 'https://x', '1.1', StatutConformite::Conforme, SourceConstat::Auto),
-            new Constat('p', 'https://x', '1.1', StatutConformite::NonConforme, SourceConstat::Manuel),
-            new Constat('p', 'https://x', '1.2', StatutConformite::Conforme, SourceConstat::Auto),
+            new Constat('p', Referentiel::Rgaa, 'https://x', '1.1', StatutConformite::Conforme, SourceConstat::Auto),
+            new Constat('p', Referentiel::Rgaa, 'https://x', '1.1', StatutConformite::NonConforme, SourceConstat::Manuel),
+            new Constat('p', Referentiel::Rgaa, 'https://x', '1.2', StatutConformite::Conforme, SourceConstat::Auto),
         ]);
 
         self::assertCount(2, $effectifs);

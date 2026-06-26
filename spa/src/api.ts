@@ -126,6 +126,7 @@ export type Statut = 'conforme' | 'non_conforme' | 'non_applicable' | 'non_teste
 export type Constat = {
   id: string;
   projetId: string;
+  referentiel: string;
   pageUrl: string;
   critereNumero: string;
   statut: Statut;

@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Domain\Audit\Service;
 
 use App\Domain\Audit\Entity\Constat;
 use App\Domain\Audit\Service\CalculateurTaux;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\SourceConstat;
 use App\Domain\Audit\ValueObject\StatutConformite;
 use PHPUnit\Framework\TestCase;
@@ -51,6 +52,6 @@ final class CalculateurTauxTest extends TestCase
 
     private function constat(string $critere, StatutConformite $statut): Constat
     {
-        return new Constat('projet-1', 'https://exemple.fr', $critere, $statut, SourceConstat::Auto);
+        return new Constat('projet-1', Referentiel::Rgaa, 'https://exemple.fr', $critere, $statut, SourceConstat::Auto);
     }
 }

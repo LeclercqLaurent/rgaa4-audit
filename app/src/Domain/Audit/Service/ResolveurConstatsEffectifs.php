@@ -22,7 +22,7 @@ final readonly class ResolveurConstatsEffectifs
     {
         $effectifs = [];
         foreach ($constats as $constat) {
-            $cle = $constat->pageUrl().'|'.$constat->critereNumero();
+            $cle = $constat->referentiel()->value.'|'.$constat->pageUrl().'|'.$constat->critereNumero();
             if (!isset($effectifs[$cle]) || SourceConstat::Manuel === $constat->source()) {
                 $effectifs[$cle] = $constat;
             }

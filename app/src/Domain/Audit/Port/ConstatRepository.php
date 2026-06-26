@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Domain\Audit\Port;
 
 use App\Domain\Audit\Entity\Constat;
+use App\Domain\Audit\ValueObject\Referentiel;
 
 interface ConstatRepository
 {
     /**
-     * Remplace l'intégralité des constats automatiques d'un projet (les constats
-     * manuels de l'auditeur ne sont pas touchés).
+     * Remplace les constats automatiques d'un projet pour un référentiel donné
+     * (les constats manuels et les autres référentiels ne sont pas touchés).
      *
      * @param list<Constat> $constats
      */
-    public function remplacerAuto(string $projetId, array $constats): void;
+    public function remplacerAuto(string $projetId, Referentiel $referentiel, array $constats): void;
 
     /**
      * Enregistre (ou remplace) le constat manuel d'un (projet, page, critère).

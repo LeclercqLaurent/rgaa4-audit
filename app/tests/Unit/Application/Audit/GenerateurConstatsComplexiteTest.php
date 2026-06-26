@@ -27,10 +27,10 @@ final class GenerateurConstatsComplexiteTest extends TestCase
 
         // 2 méthodes × 2 lentilles
         self::assertCount(4, $constats);
-        // cognitive = 20 > 15 → non conforme, sur le critère court « cog »
-        self::assertSame(StatutConformite::NonConforme, $this->statut($constats, 'A.php::foo (l.10)', 'cog'));
-        self::assertSame(StatutConformite::Conforme, $this->statut($constats, 'A.php::foo (l.10)', 'par'));
-        self::assertSame(StatutConformite::Conforme, $this->statut($constats, 'B.php::bar (l.5)', 'cog'));
+        // cognitive = 20 > 15 → non conforme
+        self::assertSame(StatutConformite::NonConforme, $this->statut($constats, 'A.php::foo (l.10)', 'cognitive'));
+        self::assertSame(StatutConformite::Conforme, $this->statut($constats, 'A.php::foo (l.10)', 'params'));
+        self::assertSame(StatutConformite::Conforme, $this->statut($constats, 'B.php::bar (l.5)', 'cognitive'));
     }
 
     /**

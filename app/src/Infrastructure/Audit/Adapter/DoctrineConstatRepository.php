@@ -7,6 +7,7 @@ namespace App\Infrastructure\Audit\Adapter;
 use App\Domain\Audit\Entity\Constat;
 use App\Domain\Audit\Port\ConstatRepository;
 use App\Domain\Audit\ValueObject\Preuve;
+use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\SourceConstat;
 use App\Domain\Audit\ValueObject\StatutConformite;
 use App\Domain\Shared\Port\IdGenerator;
@@ -21,12 +22,13 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
     ) {
     }
 
-    public function remplacerAuto(string $projetId, array $constats): void
+    public function remplacerAuto(string $projetId, Referentiel $referentiel, array $constats): void
     {
         $this->em->createQuery(
-            sprintf('DELETE FROM %s c WHERE c.projetId = :projet AND c.source = :source', ConstatEntity::class),
+            sprintf('DELETE FROM %s c WHERE c.projetId = :projet AND c.referentiel = :referentiel AND c.source = :source', ConstatEntity::class),
         )
             ->setParameter('projet', $projetId)
+            ->setParameter('referentiel', $referentiel->value)
             ->setParameter('source', SourceConstat::Auto->value)
             ->execute();
 
@@ -40,9 +42,10 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
     public function enregistrerManuel(Constat $constat): void
     {
         $this->em->createQuery(
-            sprintf('DELETE FROM %s c WHERE c.projetId = :projet AND c.pageUrl = :page AND c.critereNumero = :critere AND c.source = :source', ConstatEntity::class),
+            sprintf('DELETE FROM %s c WHERE c.projetId = :projet AND c.referentiel = :referentiel AND c.pageUrl = :page AND c.critereNumero = :critere AND c.source = :source', ConstatEntity::class),
         )
             ->setParameter('projet', $constat->projetId())
+            ->setParameter('referentiel', $constat->referentiel()->value)
             ->setParameter('page', $constat->pageUrl())
             ->setParameter('critere', $constat->critereNumero())
             ->setParameter('source', SourceConstat::Manuel->value)
@@ -71,12 +74,13 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
         $entity = new ConstatEntity(
             $this->ids->generate(),
             $constat->projetId(),
+            $constat->referentiel()->value,
             $constat->pageUrl(),
             $constat->critereNumero(),
             $constat->statut()->value,
             $constat->source()->value,
-            array_map($this->preuveToArray(...), $constat->preuves()),
         );
+        $entity->setPreuves(array_map($this->preuveToArray(...), $constat->preuves()));
         $entity->setCommentaire($constat->commentaire());
 
         return $entity;
@@ -84,15 +88,15 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
 
     private function toDomain(ConstatEntity $entity): Constat
     {
-        return new Constat(
+        return (new Constat(
             $entity->getProjetId(),
+            Referentiel::from($entity->getReferentiel()),
             $entity->getPageUrl(),
             $entity->getCritereNumero(),
             StatutConformite::from($entity->getStatut()),
             SourceConstat::from($entity->getSource()),
             array_map($this->preuveFromArray(...), $entity->getPreuves()),
-            $entity->getCommentaire(),
-        );
+        ))->avecCommentaire($entity->getCommentaire());
     }
 
     /**
