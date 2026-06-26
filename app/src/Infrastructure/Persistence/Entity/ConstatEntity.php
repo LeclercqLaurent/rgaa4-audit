@@ -30,7 +30,7 @@ class ConstatEntity
         #[ORM\Column(length: 20, options: ['charset' => 'ascii', 'collation' => 'ascii_bin'])]
         private string $referentiel,
         #[ORM\Column(name: 'page_url', length: 2048)]
-        private string $pageUrl,
+        private string $uniteAuditee,
         #[ORM\Column(name: 'critere_numero', length: 20, options: ['charset' => 'ascii', 'collation' => 'ascii_bin'])]
         private string $critereNumero,
         #[ORM\Column(length: 16, options: ['charset' => 'ascii', 'collation' => 'ascii_bin'])]
@@ -68,9 +68,9 @@ class ConstatEntity
         return $this->referentiel;
     }
 
-    public function getPageUrl(): string
+    public function getUniteAuditee(): string
     {
-        return $this->pageUrl;
+        return $this->uniteAuditee;
     }
 
     public function getCritereNumero(): string

@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * PUT /api/projets/{projetId}/constats : surcharge manuelle du statut d'un
- * critère pour une page (corps JSON : pageUrl, critereNumero, statut, commentaire).
+ * critère (corps JSON : uniteAuditee, critereNumero, statut, commentaire, referentiel).
  */
 final readonly class DefinirStatutController
 {
@@ -27,18 +27,18 @@ final readonly class DefinirStatutController
     public function __invoke(string $projetId, Request $request): JsonResponse
     {
         $payload = $this->payload($request);
-        $pageUrl = is_string($payload['pageUrl'] ?? null) ? $payload['pageUrl'] : '';
+        $uniteAuditee = is_string($payload['uniteAuditee'] ?? null) ? $payload['uniteAuditee'] : '';
         $critere = is_string($payload['critereNumero'] ?? null) ? $payload['critereNumero'] : '';
         $statut = StatutConformite::tryFrom(is_string($payload['statut'] ?? null) ? $payload['statut'] : '');
         $commentaire = is_string($payload['commentaire'] ?? null) ? $payload['commentaire'] : null;
         $referentiel = Referentiel::tryFrom(is_string($payload['referentiel'] ?? null) ? $payload['referentiel'] : '') ?? Referentiel::Rgaa;
 
-        if ('' === $pageUrl || '' === $critere || null === $statut) {
-            return new JsonResponse(['error' => 'Champs requis : pageUrl, critereNumero, statut (valeur valide).'], 400);
+        if ('' === $uniteAuditee || '' === $critere || null === $statut) {
+            return new JsonResponse(['error' => 'Champs requis : uniteAuditee, critereNumero, statut (valeur valide).'], 400);
         }
 
         try {
-            ($this->definir)(new DefinirStatutCritere($projetId, $pageUrl, $critere, $statut, $commentaire, $referentiel));
+            ($this->definir)(new DefinirStatutCritere($projetId, $uniteAuditee, $critere, $statut, $commentaire, $referentiel));
         } catch (ProjetIntrouvable $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }

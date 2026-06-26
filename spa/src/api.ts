@@ -135,7 +135,7 @@ export type Constat = {
   id: string;
   projetId: string;
   referentiel: string;
-  pageUrl: string;
+  uniteAuditee: string;
   critereNumero: string;
   statut: Statut;
   source: 'auto' | 'manuel';
@@ -336,7 +336,7 @@ export function useConsommerScans(projetId: string) {
 export function useDefinirStatut(projetId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: { pageUrl: string; critereNumero: string; statut: Statut; commentaire?: string }) =>
+    mutationFn: (body: { uniteAuditee: string; critereNumero: string; statut: Statut; commentaire?: string; referentiel?: string }) =>
       request<void>(`/api/projets/${projetId}/constats`, { method: 'PUT', body: JSON.stringify(body) }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['constats', projetId] });

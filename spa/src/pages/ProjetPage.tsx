@@ -405,11 +405,11 @@ function ConstatsSection({ projetId }: { projetId: string }) {
       </div>
       <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         <table className="table">
-          <caption className="sr-only">Constats de conformité par critère et page</caption>
+          <caption className="sr-only">Constats de conformité par critère et unité auditée</caption>
           <thead>
             <tr>
               <th scope="col">Critère</th>
-              <th scope="col">Page</th>
+              <th scope="col">Unité auditée</th>
               <th scope="col">Statut</th>
               <th scope="col">Source</th>
               <th scope="col">Statuer</th>
@@ -419,14 +419,14 @@ function ConstatsSection({ projetId }: { projetId: string }) {
             {affiches.map((constat) => (
               <tr key={constat.id}>
                 <td className="font-medium">{constat.critereNumero}</td>
-                <td className="max-w-xs truncate text-gray-600">{constat.pageUrl}</td>
+                <td className="max-w-xs truncate text-gray-600">{constat.uniteAuditee}</td>
                 <td>
                   <span className={`badge badge-${constat.statut}`}>{LIBELLES[constat.statut]}</span>
                 </td>
                 <td className="text-gray-600">{constat.source}</td>
                 <td>
                   <label className="sr-only" htmlFor={`statut-${constat.id}`}>
-                    Statut du critère {constat.critereNumero} pour {constat.pageUrl}
+                    Statut du critère {constat.critereNumero} pour {constat.uniteAuditee}
                   </label>
                   <select
                     id={`statut-${constat.id}`}
@@ -434,9 +434,10 @@ function ConstatsSection({ projetId }: { projetId: string }) {
                     value={constat.statut}
                     onChange={(e) =>
                       definir.mutate({
-                        pageUrl: constat.pageUrl,
+                        uniteAuditee: constat.uniteAuditee,
                         critereNumero: constat.critereNumero,
                         statut: e.target.value as Statut,
+                        referentiel: constat.referentiel,
                       })
                     }
                   >

@@ -8,13 +8,13 @@ use App\Domain\Audit\ValueObject\Referentiel;
 use App\Domain\Audit\ValueObject\StatutConformite;
 
 /**
- * Surcharge manuelle, par l'auditeur, du statut d'un critère pour une page.
+ * Surcharge manuelle, par l'auditeur, du statut d'un critère pour une unité auditée.
  */
 final readonly class DefinirStatutCritere
 {
     public function __construct(
         public string $projetId,
-        public string $pageUrl,
+        public string $uniteAuditee,
         public string $critereNumero,
         public StatutConformite $statut,
         public ?string $commentaire = null,

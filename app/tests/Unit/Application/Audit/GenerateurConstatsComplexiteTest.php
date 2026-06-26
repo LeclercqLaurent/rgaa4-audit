@@ -39,7 +39,7 @@ final class GenerateurConstatsComplexiteTest extends TestCase
     private function statut(array $constats, string $page, string $critere): StatutConformite
     {
         foreach ($constats as $constat) {
-            if ($constat->pageUrl() === $page && $constat->critereNumero() === $critere) {
+            if ($constat->uniteAuditee() === $page && $constat->critereNumero() === $critere) {
                 return $constat->statut();
             }
         }

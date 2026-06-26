@@ -93,13 +93,13 @@
     <table>
         <caption>Non-conformités à corriger</caption>
         <thead>
-            <tr><th scope="col">Critère</th><th scope="col">Page</th><th scope="col">Preuves</th></tr>
+            <tr><th scope="col">Critère</th><th scope="col">Unité auditée</th><th scope="col">Preuves</th></tr>
         </thead>
         <tbody>
             {% for ligne in plan %}
             <tr>
                 <td>{{ ligne.critereNumero }}<br><span class="preuve">{{ ligne.intitule }}</span></td>
-                <td class="preuve">{{ ligne.pageUrl }}</td>
+                <td class="preuve">{{ ligne.uniteAuditee }}</td>
                 <td>
                     {% for preuve in ligne.preuves %}
                     <div class="preuve">{{ preuve.regle }}{% if preuve.cible %} — <code>{{ preuve.cible }}</code>{% endif %}</div>

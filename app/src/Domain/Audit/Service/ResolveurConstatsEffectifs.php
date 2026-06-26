@@ -9,7 +9,8 @@ use App\Domain\Audit\ValueObject\SourceConstat;
 
 /**
  * Réduit l'ensemble des constats (auto + manuels) au constat « effectif » par
- * (page, critère) : le constat manuel de l'auditeur fait foi sur l'automatique.
+ * (référentiel, unité auditée, critère) : le constat manuel de l'auditeur fait
+ * foi sur l'automatique.
  */
 final readonly class ResolveurConstatsEffectifs
 {
@@ -22,7 +23,7 @@ final readonly class ResolveurConstatsEffectifs
     {
         $effectifs = [];
         foreach ($constats as $constat) {
-            $cle = $constat->referentiel()->value.'|'.$constat->pageUrl().'|'.$constat->critereNumero();
+            $cle = $constat->referentiel()->value.'|'.$constat->uniteAuditee().'|'.$constat->critereNumero();
             if (!isset($effectifs[$cle]) || SourceConstat::Manuel === $constat->source()) {
                 $effectifs[$cle] = $constat;
             }

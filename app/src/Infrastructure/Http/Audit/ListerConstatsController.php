@@ -41,10 +41,10 @@ final readonly class ListerConstatsController
     private function toArray(Constat $constat): array
     {
         return [
-            'id' => $constat->referentiel()->value.'-'.sha1($constat->pageUrl()).'-'.$constat->critereNumero(),
+            'id' => $constat->referentiel()->value.'-'.sha1($constat->uniteAuditee()).'-'.$constat->critereNumero(),
             'projetId' => $constat->projetId(),
             'referentiel' => $constat->referentiel()->value,
-            'pageUrl' => $constat->pageUrl(),
+            'uniteAuditee' => $constat->uniteAuditee(),
             'critereNumero' => $constat->critereNumero(),
             'statut' => $constat->statut()->value,
             'source' => $constat->source()->value,

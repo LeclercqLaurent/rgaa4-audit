@@ -30,7 +30,7 @@ final class TauxApiTest extends ApiSecuriseeTestCase
 
         // Le critère 1.1 (image-alt → wcag111) est non conforme en auto ; on le passe conforme.
         $client->request('PUT', '/api/projets/'.$projetId.'/constats', [
-            'json' => ['pageUrl' => self::URL_PAGE, 'critereNumero' => '1.1', 'statut' => 'conforme', 'commentaire' => 'Vérifié manuellement.'],
+            'json' => ['uniteAuditee' => self::URL_PAGE, 'critereNumero' => '1.1', 'statut' => 'conforme', 'commentaire' => 'Vérifié manuellement.'],
         ]);
         $this->assertResponseStatusCodeSame(204);
 
@@ -47,7 +47,7 @@ final class TauxApiTest extends ApiSecuriseeTestCase
     public function testSurchargeSurProjetInconnuRenvoie404(): void
     {
         $this->clientAuthentifie()->request('PUT', '/api/projets/019f0000-0000-7000-8000-000000000000/constats', [
-            'json' => ['pageUrl' => self::URL_PAGE, 'critereNumero' => '1.1', 'statut' => 'conforme'],
+            'json' => ['uniteAuditee' => self::URL_PAGE, 'critereNumero' => '1.1', 'statut' => 'conforme'],
         ]);
 
         $this->assertResponseStatusCodeSame(404);

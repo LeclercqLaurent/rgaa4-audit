@@ -28,7 +28,7 @@ final readonly class DefinirStatutCritereHandler
         $this->constats->enregistrerManuel((new Constat(
             $command->projetId,
             $command->referentiel,
-            $command->pageUrl,
+            $command->uniteAuditee,
             $command->critereNumero,
             $command->statut,
             SourceConstat::Manuel,

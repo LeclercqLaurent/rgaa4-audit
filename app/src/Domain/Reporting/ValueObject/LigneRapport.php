@@ -9,7 +9,8 @@ use App\Domain\Audit\ValueObject\SourceConstat;
 use App\Domain\Audit\ValueObject\StatutConformite;
 
 /**
- * Une ligne du rapport : l'état d'un critère pour une page, avec ses preuves.
+ * Une ligne du rapport : l'état d'un critère pour une unité auditée, avec ses
+ * preuves.
  */
 final readonly class LigneRapport
 {
@@ -19,7 +20,7 @@ final readonly class LigneRapport
     public function __construct(
         public string $critereNumero,
         public string $intitule,
-        public string $pageUrl,
+        public string $uniteAuditee,
         public StatutConformite $statut,
         public SourceConstat $source,
         public array $preuves,

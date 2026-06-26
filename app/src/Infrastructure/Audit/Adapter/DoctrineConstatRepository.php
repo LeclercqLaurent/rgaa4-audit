@@ -42,11 +42,11 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
     public function enregistrerManuel(Constat $constat): void
     {
         $this->em->createQuery(
-            sprintf('DELETE FROM %s c WHERE c.projetId = :projet AND c.referentiel = :referentiel AND c.pageUrl = :page AND c.critereNumero = :critere AND c.source = :source', ConstatEntity::class),
+            sprintf('DELETE FROM %s c WHERE c.projetId = :projet AND c.referentiel = :referentiel AND c.uniteAuditee = :unite AND c.critereNumero = :critere AND c.source = :source', ConstatEntity::class),
         )
             ->setParameter('projet', $constat->projetId())
             ->setParameter('referentiel', $constat->referentiel()->value)
-            ->setParameter('page', $constat->pageUrl())
+            ->setParameter('unite', $constat->uniteAuditee())
             ->setParameter('critere', $constat->critereNumero())
             ->setParameter('source', SourceConstat::Manuel->value)
             ->execute();
@@ -75,7 +75,7 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
             $this->ids->generate(),
             $constat->projetId(),
             $constat->referentiel()->value,
-            $constat->pageUrl(),
+            $constat->uniteAuditee(),
             $constat->critereNumero(),
             $constat->statut()->value,
             $constat->source()->value,
@@ -91,7 +91,7 @@ final readonly class DoctrineConstatRepository implements ConstatRepository
         return (new Constat(
             $entity->getProjetId(),
             Referentiel::from($entity->getReferentiel()),
-            $entity->getPageUrl(),
+            $entity->getUniteAuditee(),
             $entity->getCritereNumero(),
             StatutConformite::from($entity->getStatut()),
             SourceConstat::from($entity->getSource()),

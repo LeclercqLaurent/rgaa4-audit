@@ -112,7 +112,7 @@ final readonly class ObtenirRapportHandler
             $lignes[$info['thematique']][] = new LigneRapport(
                 $constat->critereNumero(),
                 $info['intitule'],
-                $constat->pageUrl(),
+                $constat->uniteAuditee(),
                 $constat->statut(),
                 $constat->source(),
                 $constat->preuves(),

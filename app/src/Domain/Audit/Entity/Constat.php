@@ -10,10 +10,11 @@ use App\Domain\Audit\ValueObject\SourceConstat;
 use App\Domain\Audit\ValueObject\StatutConformite;
 
 /**
- * Constat de conformité d'un critère RGAA pour une page d'un projet.
+ * Constat de conformité d'un critère pour une unité auditée d'un projet
+ * (une page web pour RGAA, une méthode pour la complexité…).
  *
- * Un constat « auto » est proposé par le scan ; un constat « manuel » est établi
- * par l'auditeur et fait foi (cf. lot A4).
+ * Un constat « auto » est proposé par le moteur ; un constat « manuel » est
+ * établi par l'auditeur et fait foi (cf. lot A4).
  */
 final class Constat
 {
@@ -25,7 +26,7 @@ final class Constat
     public function __construct(
         private readonly string $projetId,
         private readonly Referentiel $referentiel,
-        private readonly string $pageUrl,
+        private readonly string $uniteAuditee,
         private readonly string $critereNumero,
         private StatutConformite $statut,
         private SourceConstat $source,
@@ -50,9 +51,9 @@ final class Constat
         return $this->referentiel;
     }
 
-    public function pageUrl(): string
+    public function uniteAuditee(): string
     {
-        return $this->pageUrl;
+        return $this->uniteAuditee;
     }
 
     public function critereNumero(): string
