@@ -54,6 +54,19 @@ services:
     networks:
       - rgaa
 
+  # SPA React + TypeScript (Vite). Dev : `docker compose exec spa npm run dev`.
+  spa:
+    image: node:24
+    container_name: spa_rgaa
+    working_dir: /spa
+    volumes:
+      - ./spa:/spa
+    command: ["sleep", "infinity"]
+    ports:
+      - "5173:5173"
+    networks:
+      - rgaa
+
 volumes:
   db_data:
 

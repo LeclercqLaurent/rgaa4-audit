@@ -13,3 +13,8 @@ docker-compose.override.yaml
 
 # Cache Puppeteer (Chromium)
 /scanner/.cache/
+
+# SPA React
+/spa/node_modules/
+/spa/dist/
+/spa/.env.local

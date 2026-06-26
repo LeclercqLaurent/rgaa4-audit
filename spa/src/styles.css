@@ -1,0 +1,153 @@
+:root {
+  --bleu: #000091;
+  --rouge: #ce0500;
+  --vert: #18753c;
+  --gris: #666;
+  --bordure: #ccc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--bleu);
+}
+
+:focus-visible {
+  outline: 3px solid var(--bleu);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+
+.skip-link:focus {
+  left: 8px;
+  top: 8px;
+  background: #fff;
+  padding: 8px;
+  z-index: 10;
+}
+
+.entete {
+  background: var(--bleu);
+  padding: 12px 24px;
+}
+
+.entete__logo {
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.contenu {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .grille--2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.carte {
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.champ input,
+.champ select {
+  padding: 8px;
+  border: 1px solid var(--bordure);
+  border-radius: 4px;
+  font-size: 15px;
+}
+
+.bouton {
+  background: var(--bleu);
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.bouton:disabled {
+  background: var(--gris);
+  cursor: not-allowed;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid var(--bordure);
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #f0f0f5;
+}
+
+.statut--conforme {
+  color: var(--vert);
+  font-weight: bold;
+}
+
+.statut--non_conforme {
+  color: var(--rouge);
+  font-weight: bold;
+}
+
+.statut--non_applicable,
+.statut--non_teste {
+  color: var(--gris);
+}
+
+.taux {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--bleu);
+}
+
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
