@@ -19,3 +19,8 @@ app_http:
 api_login_check:
     path: /api/login_check
     methods: [POST]
+
+# Renouvellement du JWT à partir d'un refresh token (intercepté par le firewall).
+api_refresh_token:
+    path: /api/token/refresh
+    methods: [POST]

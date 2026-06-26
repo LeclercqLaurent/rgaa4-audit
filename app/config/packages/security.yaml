@@ -23,6 +23,12 @@ security:
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             login_throttling:
                 max_attempts: 5
+        token_refresh:
+            pattern: ^/api/token/refresh
+            stateless: true
+            provider: app_utilisateurs
+            refresh_jwt:
+                check_path: /api/token/refresh
         api:
             pattern: ^/api
             stateless: true
@@ -32,6 +38,7 @@ security:
     # Note : seule la *première* règle correspondante s'applique.
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
         - { path: ^/api/thematiques, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }

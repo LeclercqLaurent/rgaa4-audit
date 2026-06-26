@@ -7,7 +7,9 @@ import {
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8082';
 
 const CLE_JETON = 'rgaa_jwt';
+const CLE_REFRESH = 'rgaa_refresh';
 let jeton: string | null = localStorage.getItem(CLE_JETON);
+let refresh: string | null = localStorage.getItem(CLE_REFRESH);
 
 export function getJeton(): string | null {
   return jeton;
@@ -22,6 +24,22 @@ export function setJeton(valeur: string | null): void {
   }
 }
 
+function setRefresh(valeur: string | null): void {
+  refresh = valeur;
+  if (valeur) {
+    localStorage.setItem(CLE_REFRESH, valeur);
+  } else {
+    localStorage.removeItem(CLE_REFRESH);
+  }
+}
+
+export function purgerSession(): void {
+  setJeton(null);
+  setRefresh(null);
+}
+
+type Jetons = { token: string; refresh_token?: string };
+
 export async function connexion(email: string, motDePasse: string): Promise<void> {
   const reponse = await fetch(`${BASE}/api/login_check`, {
     method: 'POST',
@@ -33,8 +51,33 @@ export async function connexion(email: string, motDePasse: string): Promise<void
     throw new Error('Identifiants invalides.');
   }
 
-  const data = (await reponse.json()) as { token: string };
+  const data = (await reponse.json()) as Jetons;
   setJeton(data.token);
+  setRefresh(data.refresh_token ?? null);
+}
+
+async function rafraichir(): Promise<boolean> {
+  if (!refresh) {
+    return false;
+  }
+
+  const reponse = await fetch(`${BASE}/api/token/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ refresh_token: refresh }),
+  });
+
+  if (!reponse.ok) {
+    purgerSession();
+
+    return false;
+  }
+
+  const data = (await reponse.json()) as Jetons;
+  setJeton(data.token);
+  setRefresh(data.refresh_token ?? null);
+
+  return true;
 }
 
 export type Page = { id: string; url: string; titre: string };
@@ -97,7 +140,7 @@ export type Taux = {
   nonTestes: number;
 };
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, init?: RequestInit, reessai = false): Promise<T> {
   const response = await fetch(`${BASE}${path}`, {
     ...init,
     headers: {
@@ -108,8 +151,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     },
   });
 
+  // Jeton expiré : on tente un renouvellement silencieux, puis on rejoue une fois.
+  if (401 === response.status && !reessai && (await rafraichir())) {
+    return request<T>(path, init, true);
+  }
+
   if (401 === response.status) {
-    setJeton(null);
+    purgerSession();
   }
 
   if (!response.ok) {

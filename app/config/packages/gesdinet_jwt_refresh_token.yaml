@@ -1,0 +1,8 @@
+gesdinet_jwt_refresh_token:
+    refresh_token_class: App\Infrastructure\Persistence\Entity\RefreshTokenEntity
+    # Refresh token valable 7 jours (ANSSI) ; rotation : un refresh token n'est
+    # utilisable qu'une fois (un nouveau est émis à chaque renouvellement).
+    ttl: 604800
+    single_use: true
+    # Renvoie le refresh token dans le corps JSON du login et du refresh.
+    return_expiration: true

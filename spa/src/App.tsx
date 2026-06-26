@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
-import { getJeton, setJeton } from './api';
+import { getJeton, purgerSession } from './api';
 import LoginPage from './pages/LoginPage';
 import ProjetsPage from './pages/ProjetsPage';
 import ProjetPage from './pages/ProjetPage';
@@ -14,7 +14,7 @@ export default function App() {
   const [authentifie, setAuthentifie] = useState<boolean>(() => null !== getJeton());
 
   const deconnexion = () => {
-    setJeton(null);
+    purgerSession();
     queryClient.clear();
     setAuthentifie(false);
   };
