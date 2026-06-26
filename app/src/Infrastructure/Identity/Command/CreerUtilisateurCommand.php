@@ -35,7 +35,8 @@ final class CreerUtilisateurCommand extends Command
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'Adresse e-mail')
             ->addArgument('motDePasse', InputArgument::REQUIRED, 'Mot de passe (≥ 12 caractères)')
-            ->addOption('role', null, InputOption::VALUE_REQUIRED, 'Rôle : auditeur ou client', 'auditeur');
+            ->addOption('role', null, InputOption::VALUE_REQUIRED, 'Rôle : auditeur ou client', 'auditeur')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Ignore la longueur minimale (dev local uniquement)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,8 +47,8 @@ final class CreerUtilisateurCommand extends Command
         $emailBrut = is_string($emailBrut) ? $emailBrut : '';
         $motDePasse = is_string($motDePasse) ? $motDePasse : '';
 
-        if (mb_strlen($motDePasse) < 12) {
-            $io->error('Le mot de passe doit faire au moins 12 caractères (recommandation ANSSI).');
+        if (mb_strlen($motDePasse) < 12 && false === $input->getOption('force')) {
+            $io->error('Le mot de passe doit faire au moins 12 caractères (recommandation ANSSI). Utiliser --force en dev local pour outrepasser.');
 
             return Command::FAILURE;
         }
