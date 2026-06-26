@@ -1,6 +1,25 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Projet, useCreerProjet, useModifierProjet, useProjets, useSupprimerProjet } from '../api';
+import { DernierScan, Projet, ouvrirRapport, useCreerProjet, useModifierProjet, useProjets, useSupprimerProjet } from '../api';
+
+const LIBELLE_STATUT: Record<DernierScan['statut'], string> = {
+  pending: 'En attente',
+  running: 'En cours',
+  done: 'Terminé',
+  failed: 'Échoué',
+};
+
+function ResumeScan({ scan }: { scan: DernierScan | null }) {
+  if (!scan) {
+    return <>—</>;
+  }
+
+  return (
+    <>
+      {LIBELLE_STATUT[scan.statut]} <small>({new Date(scan.date).toLocaleDateString('fr-FR')})</small>
+    </>
+  );
+}
 
 export default function ProjetsPage() {
   const { data: projets, isLoading, isError } = useProjets();
@@ -30,6 +49,7 @@ export default function ProjetsPage() {
               <th scope="col">Client</th>
               <th scope="col">URL de référence</th>
               <th scope="col">Pages</th>
+              <th scope="col">Dernier scan</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -125,6 +145,9 @@ function LigneProjet({ projet }: { projet: Projet }) {
         </td>
         <td>{projet.pages.length}</td>
         <td>
+          <ResumeScan scan={projet.dernierScan} />
+        </td>
+        <td>
           <div className="actions">
             <button type="button" className="bouton bouton--petit" onClick={enregistrer} disabled={modifier.isPending}>
               Enregistrer
@@ -147,10 +170,23 @@ function LigneProjet({ projet }: { projet: Projet }) {
       <td>{projet.urlReference}</td>
       <td>{projet.pages.length}</td>
       <td>
+        <ResumeScan scan={projet.dernierScan} />
+      </td>
+      <td>
         <div className="actions">
           <Link className="bouton bouton--petit" to={`/projets/${projet.id}`}>
             Ouvrir
           </Link>
+          {projet.dernierScan?.statut === 'done' && (
+            <button
+              type="button"
+              className="bouton bouton--petit"
+              onClick={() => void ouvrirRapport(projet.id, true)}
+              aria-label={`Rapport PDF de ${projet.nom}`}
+            >
+              PDF
+            </button>
+          )}
           <button type="button" className="bouton bouton--petit" onClick={ouvrirEdition} aria-label={`Modifier ${projet.nom}`}>
             Modifier
           </button>

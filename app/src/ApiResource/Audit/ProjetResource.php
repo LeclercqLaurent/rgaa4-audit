@@ -61,6 +61,7 @@ final class ProjetResource
         public string $urlReference,
         public string $dateCreation,
         public array $pages,
+        public ?DernierScanResource $dernierScan = null,
     ) {
     }
 }

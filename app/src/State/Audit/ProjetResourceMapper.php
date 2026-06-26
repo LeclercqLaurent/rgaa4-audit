@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\State\Audit;
 
+use App\ApiResource\Audit\DernierScanResource;
 use App\ApiResource\Audit\PageResource;
 use App\ApiResource\Audit\ProjetResource;
 use App\Domain\Audit\Entity\Page;
 use App\Domain\Audit\Entity\Projet;
+use App\Domain\Scan\ValueObject\ResumeScan;
 use DateTimeInterface;
 
 /**
@@ -15,7 +17,7 @@ use DateTimeInterface;
  */
 final readonly class ProjetResourceMapper
 {
-    public function toResource(Projet $projet): ProjetResource
+    public function toResource(Projet $projet, ?ResumeScan $dernierScan = null): ProjetResource
     {
         return new ProjetResource(
             $projet->id(),
@@ -24,6 +26,10 @@ final readonly class ProjetResourceMapper
             (string) $projet->urlReference(),
             $projet->dateCreation()->format(DateTimeInterface::ATOM),
             array_map($this->pageToResource(...), $projet->pages()),
+            null === $dernierScan ? null : new DernierScanResource(
+                $dernierScan->statut->value,
+                $dernierScan->dateCreation->format(DateTimeInterface::ATOM),
+            ),
         );
     }
 

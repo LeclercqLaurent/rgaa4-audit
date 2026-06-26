@@ -82,6 +82,8 @@ async function rafraichir(): Promise<boolean> {
 
 export type Page = { id: string; url: string; titre: string };
 
+export type DernierScan = { statut: Scan['statut']; date: string };
+
 export type Projet = {
   id: string;
   nom: string;
@@ -89,6 +91,7 @@ export type Projet = {
   urlReference: string;
   dateCreation: string;
   pages: Page[];
+  dernierScan: DernierScan | null;
 };
 
 export type ScanPageResume = {
@@ -140,12 +143,11 @@ export type Taux = {
   nonTestes: number;
 };
 
-async function request<T>(path: string, init?: RequestInit, reessai = false): Promise<T> {
+async function fetchAuthentifie(path: string, init?: RequestInit, reessai = false): Promise<Response> {
   const response = await fetch(`${BASE}${path}`, {
     ...init,
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json',
       ...(jeton ? { Authorization: `Bearer ${jeton}` } : {}),
       ...(init?.headers ?? {}),
     },
@@ -153,12 +155,21 @@ async function request<T>(path: string, init?: RequestInit, reessai = false): Pr
 
   // Jeton expiré : on tente un renouvellement silencieux, puis on rejoue une fois.
   if (401 === response.status && !reessai && (await rafraichir())) {
-    return request<T>(path, init, true);
+    return fetchAuthentifie(path, init, true);
   }
 
   if (401 === response.status) {
     purgerSession();
   }
+
+  return response;
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetchAuthentifie(path, {
+    ...init,
+    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  });
 
   if (!response.ok) {
     throw new Error(`Requête ${path} : HTTP ${response.status}`);
@@ -167,8 +178,23 @@ async function request<T>(path: string, init?: RequestInit, reessai = false): Pr
   return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
 }
 
-export const rapportUrl = (projetId: string, pdf = false): string =>
-  `${BASE}/api/projets/${projetId}/rapport${pdf ? '.pdf' : ''}`;
+/**
+ * Ouvre le rapport (HTML ou PDF) dans un nouvel onglet. L'endpoint étant
+ * protégé, on télécharge avec le JWT puis on ouvre le blob obtenu.
+ */
+export async function ouvrirRapport(projetId: string, pdf: boolean): Promise<void> {
+  const response = await fetchAuthentifie(`/api/projets/${projetId}/rapport${pdf ? '.pdf' : ''}`, {
+    headers: { Accept: pdf ? 'application/pdf' : 'text/html' },
+  });
+
+  if (!response.ok) {
+    throw new Error('Rapport indisponible.');
+  }
+
+  const url = URL.createObjectURL(await response.blob());
+  window.open(url, '_blank', 'noopener');
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
 
 export function useProjets() {
   return useQuery({ queryKey: ['projets'], queryFn: () => request<Projet[]>('/api/projets') });

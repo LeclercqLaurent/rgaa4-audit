@@ -7,8 +7,10 @@ namespace App\Infrastructure\Scan\Adapter;
 use App\Domain\Scan\Entity\Scan;
 use App\Domain\Scan\Port\ScanRepository;
 use App\Domain\Scan\ValueObject\ResultatPage;
+use App\Domain\Scan\ValueObject\ResumeScan;
 use App\Domain\Scan\ValueObject\StatutScan;
 use App\Infrastructure\Persistence\Entity\ScanEntity;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class DoctrineScanRepository implements ScanRepository
@@ -45,6 +47,31 @@ final readonly class DoctrineScanRepository implements ScanRepository
         $entities = $this->em->getRepository(ScanEntity::class)->findBy(['projetId' => $projetId], ['dateCreation' => 'DESC']);
 
         return array_map($this->toDomain(...), $entities);
+    }
+
+    public function dernierResumeParProjet(): array
+    {
+        $rows = $this->em
+            ->createQuery(sprintf('SELECT s.projetId AS projetId, s.statut AS statut, s.dateCreation AS date FROM %s s ORDER BY s.dateCreation DESC', ScanEntity::class))
+            ->getArrayResult();
+
+        $resumes = [];
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $projetId = is_string($row['projetId'] ?? null) ? $row['projetId'] : '';
+            if ('' === $projetId || isset($resumes[$projetId])) {
+                continue;
+            }
+
+            $statut = is_string($row['statut'] ?? null) ? $row['statut'] : StatutScan::EnAttente->value;
+            $date = ($row['date'] ?? null) instanceof DateTimeImmutable ? $row['date'] : new DateTimeImmutable();
+            $resumes[$projetId] = new ResumeScan(StatutScan::from($statut), $date);
+        }
+
+        return $resumes;
     }
 
     public function supprimerPourProjet(string $projetId): void

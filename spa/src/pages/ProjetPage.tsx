@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   Statut,
-  rapportUrl,
+  ouvrirRapport,
   useAjouterPage,
   useConstats,
   useDefinirStatut,
@@ -51,9 +51,13 @@ export default function ProjetPage() {
       <ConstatsSection projetId={projetId} />
 
       <h2>Rapport</h2>
-      <p>
-        <a href={rapportUrl(projetId)}>Voir le rapport (HTML)</a> ·{' '}
-        <a href={rapportUrl(projetId, true)}>Télécharger le PDF</a>
+      <p className="actions">
+        <button type="button" className="bouton" onClick={() => void ouvrirRapport(projetId, false)}>
+          Voir le rapport (HTML)
+        </button>
+        <button type="button" className="bouton" onClick={() => void ouvrirRapport(projetId, true)}>
+          Télécharger le PDF
+        </button>
       </p>
     </>
   );
