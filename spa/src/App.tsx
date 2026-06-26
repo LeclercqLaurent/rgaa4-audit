@@ -29,7 +29,7 @@ export default function App() {
         <header className="bg-brand text-white shadow">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
             <Link to="/" className="text-lg font-bold text-white no-underline">
-              Audit RGAA 4
+              Auditor
             </Link>
             {authentifie && (
               <button type="button" className="btn btn-sm btn-secondary" onClick={deconnexion}>
