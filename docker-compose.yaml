@@ -54,6 +54,24 @@ services:
     networks:
       - rgaa
 
+  # Worker Messenger : consomme la file « async » (scans, génération de constats).
+  # Réutilise l'image PHP de www ; pilote le scanner Node via la CLI Docker (cf.
+  # override dev). Redémarré périodiquement (bonne pratique workers Symfony).
+  worker:
+    build:
+      context: .
+      dockerfile: build/php/Dockerfile
+    container_name: worker_rgaa
+    depends_on:
+      - db
+    volumes:
+      - ./app:/var/www/app
+    working_dir: /var/www/app
+    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600", "-v"]
+    restart: unless-stopped
+    networks:
+      - rgaa
+
   # SPA React + TypeScript (Vite). Démarre le serveur de dev automatiquement
   # (installe les deps au premier lancement si node_modules est absent).
   spa:
