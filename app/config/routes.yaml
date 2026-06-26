@@ -14,3 +14,8 @@ controllers:
 app_http:
     resource: ../src/Infrastructure/Http/
     type: attribute
+
+# Point de connexion JWT (intercepté par le firewall, sans contrôleur).
+api_login_check:
+    path: /api/login_check
+    methods: [POST]

@@ -39,6 +39,9 @@ services:
     App\Domain\Reporting\Port\RapportRenderer:
         '@App\Infrastructure\Reporting\Adapter\RapportRendererTwigDompdf'
 
+    App\Domain\Identity\Port\UtilisateurRepository:
+        '@App\Infrastructure\Identity\Adapter\DoctrineUtilisateurRepository'
+
     App\Domain\Audit\Port\ProjetRepository:
         '@App\Infrastructure\Audit\Adapter\DoctrineProjetRepository'
 

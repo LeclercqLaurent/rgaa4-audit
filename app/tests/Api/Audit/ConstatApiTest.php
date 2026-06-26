@@ -4,29 +4,23 @@ declare(strict_types=1);
 
 namespace App\Tests\Api\Audit;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Api\ApiSecuriseeTestCase;
 
 /**
  * Spécification d'acceptation du Lot A3 : un scan terminé alimente les constats
  * de conformité RGAA (mapping axe → WCAG → RGAA), avec preuves.
- *
- * Le PageScanner est mocké (violation image-alt → tag wcag111) et le transport
- * Messenger est synchrone en test, donc les constats sont générés en ligne.
  */
-final class ConstatApiTest extends ApiTestCase
+final class ConstatApiTest extends ApiSecuriseeTestCase
 {
-    protected static ?bool $alwaysBootKernel = true;
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->purger();
+        $this->purgerAudit();
     }
 
     public function testUnScanAlimenteLesConstatsRgaa(): void
     {
-        $client = self::createClient();
+        $client = $this->clientAuthentifie();
         $projetId = $this->creerProjetAvecPage($client);
 
         $client->request('POST', '/api/projets/'.$projetId.'/scans', ['json' => (object) []]);
@@ -60,15 +54,5 @@ final class ConstatApiTest extends ApiTestCase
         ]);
 
         return $data['id'];
-    }
-
-    private function purger(): void
-    {
-        $connection = self::getContainer()->get(EntityManagerInterface::class)->getConnection();
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
-        foreach (['audit_constat', 'scan', 'audit_page', 'audit_projet'] as $table) {
-            $connection->executeStatement('TRUNCATE TABLE '.$table);
-        }
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

@@ -42,6 +42,9 @@ a {
 .entete {
   background: var(--bleu);
   padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .entete__logo {
@@ -49,6 +52,16 @@ a {
   font-weight: bold;
   text-decoration: none;
   font-size: 18px;
+}
+
+.entete__deconnexion {
+  background: #fff;
+  color: var(--bleu);
+  border: 0;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .contenu {

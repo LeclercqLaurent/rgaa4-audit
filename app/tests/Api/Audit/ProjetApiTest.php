@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace App\Tests\Api\Audit;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Api\ApiSecuriseeTestCase;
 
 /**
  * Spécification d'acceptation du contexte Audit (Lot A1) : création de projet
- * et constitution de l'échantillon de pages, exprimée au niveau de l'API REST.
+ * et constitution de l'échantillon de pages, sur l'espace sécurisé (JWT).
  *
  * Note d'écart au socle : Behat (Gherkin) n'est pas compatible Symfony 8.1
  * (contrainte symfony/console ≤ 7.x). On exprime donc les scénarios
  * d'acceptation via ApiTestCase (PHPUnit), même intention « specs exécutables ».
  */
-final class ProjetApiTest extends ApiTestCase
+final class ProjetApiTest extends ApiSecuriseeTestCase
 {
-    protected static ?bool $alwaysBootKernel = true;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -27,7 +24,7 @@ final class ProjetApiTest extends ApiTestCase
 
     public function testCreerUnProjetDAudit(): void
     {
-        $client = self::createClient();
+        $client = $this->clientAuthentifie();
 
         $client->request('POST', '/api/projets', [
             'json' => [
@@ -48,7 +45,7 @@ final class ProjetApiTest extends ApiTestCase
 
     public function testAjouterUnePageALEchantillon(): void
     {
-        $client = self::createClient();
+        $client = $this->clientAuthentifie();
         $id = $this->creerProjet($client);
 
         $client->request('POST', '/api/projets/'.$id.'/pages', [
@@ -64,7 +61,7 @@ final class ProjetApiTest extends ApiTestCase
 
     public function testUrlDeReferenceInvalideEstRejetee(): void
     {
-        $client = self::createClient();
+        $client = $this->clientAuthentifie();
 
         $client->request('POST', '/api/projets', [
             'json' => ['nom' => 'X', 'client' => 'Y', 'urlReference' => 'pas-une-url'],
@@ -73,11 +70,16 @@ final class ProjetApiTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
     }
 
+    public function testAccesRefuseSansJeton(): void
+    {
+        self::createClient()->request('GET', '/api/projets');
+
+        $this->assertResponseStatusCodeSame(401);
+    }
+
     public function testAjouterUnePageSurUnProjetInconnuRenvoie404(): void
     {
-        $client = self::createClient();
-
-        $client->request('POST', '/api/projets/019f0000-0000-7000-8000-000000000000/pages', [
+        $this->clientAuthentifie()->request('POST', '/api/projets/019f0000-0000-7000-8000-000000000000/pages', [
             'json' => ['url' => 'https://exemple.fr/x', 'titre' => 'X'],
         ]);
 
@@ -94,15 +96,5 @@ final class ProjetApiTest extends ApiTestCase
         $data = $reponse->toArray();
 
         return $data['id'];
-    }
-
-    private function purgerAudit(): void
-    {
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        $connection = $em->getConnection();
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
-        $connection->executeStatement('TRUNCATE TABLE audit_page');
-        $connection->executeStatement('TRUNCATE TABLE audit_projet');
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

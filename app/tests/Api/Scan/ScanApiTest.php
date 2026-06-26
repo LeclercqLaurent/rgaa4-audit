@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Api\Scan;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Api\ApiSecuriseeTestCase;
 
 /**
  * Spécification d'acceptation du contexte Scan (Lot A2) : lancement d'un scan
@@ -14,19 +13,17 @@ use Doctrine\ORM\EntityManagerInterface;
  * Le PageScanner réel (Node) est remplacé par un double (cf. services_test.yaml)
  * et le transport Messenger est synchrone en test : le scan s'exécute en ligne.
  */
-final class ScanApiTest extends ApiTestCase
+final class ScanApiTest extends ApiSecuriseeTestCase
 {
-    protected static ?bool $alwaysBootKernel = true;
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->purger();
+        $this->purgerAudit();
     }
 
     public function testLancerUnScanProduitDesResultatsParPage(): void
     {
-        $client = self::createClient();
+        $client = $this->clientAuthentifie();
         $projetId = $this->creerProjetAvecPage($client);
 
         $reponse = $client->request('POST', '/api/projets/'.$projetId.'/scans', ['json' => (object) []]);
@@ -47,7 +44,7 @@ final class ScanApiTest extends ApiTestCase
 
     public function testScannerUnProjetInconnuRenvoie404(): void
     {
-        self::createClient()->request('POST', '/api/projets/019f0000-0000-7000-8000-000000000000/scans', ['json' => (object) []]);
+        $this->clientAuthentifie()->request('POST', '/api/projets/019f0000-0000-7000-8000-000000000000/scans', ['json' => (object) []]);
 
         $this->assertResponseStatusCodeSame(404);
     }
@@ -64,15 +61,5 @@ final class ScanApiTest extends ApiTestCase
         ]);
 
         return $data['id'];
-    }
-
-    private function purger(): void
-    {
-        $connection = self::getContainer()->get(EntityManagerInterface::class)->getConnection();
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
-        foreach (['scan', 'audit_page', 'audit_projet'] as $table) {
-            $connection->executeStatement('TRUNCATE TABLE '.$table);
-        }
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

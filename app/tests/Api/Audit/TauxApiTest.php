@@ -4,28 +4,25 @@ declare(strict_types=1);
 
 namespace App\Tests\Api\Audit;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Api\ApiSecuriseeTestCase;
 
 /**
  * Spécification d'acceptation du Lot A4 : surcharge manuelle d'un constat et
  * impact sur le taux de conformité.
  */
-final class TauxApiTest extends ApiTestCase
+final class TauxApiTest extends ApiSecuriseeTestCase
 {
-    protected static ?bool $alwaysBootKernel = true;
-
     private const URL_PAGE = 'https://exemple.fr/accueil';
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->purger();
+        $this->purgerAudit();
     }
 
     public function testLaSurchargeManuellePrimeEtModifieLeTaux(): void
     {
-        $client = self::createClient();
+        $client = $this->clientAuthentifie();
         $projetId = $this->creerProjetScanne($client);
 
         $avant = $client->request('GET', '/api/projets/'.$projetId.'/taux')->toArray();
@@ -49,7 +46,7 @@ final class TauxApiTest extends ApiTestCase
 
     public function testSurchargeSurProjetInconnuRenvoie404(): void
     {
-        self::createClient()->request('PUT', '/api/projets/019f0000-0000-7000-8000-000000000000/constats', [
+        $this->clientAuthentifie()->request('PUT', '/api/projets/019f0000-0000-7000-8000-000000000000/constats', [
             'json' => ['pageUrl' => self::URL_PAGE, 'critereNumero' => '1.1', 'statut' => 'conforme'],
         ]);
 
@@ -82,15 +79,5 @@ final class TauxApiTest extends ApiTestCase
         }
 
         self::fail(sprintf('Aucun constat pour le critère %s.', $critere));
-    }
-
-    private function purger(): void
-    {
-        $connection = self::getContainer()->get(EntityManagerInterface::class)->getConnection();
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
-        foreach (['audit_constat', 'scan', 'audit_page', 'audit_projet'] as $table) {
-            $connection->executeStatement('TRUNCATE TABLE '.$table);
-        }
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

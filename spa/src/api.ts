@@ -6,6 +6,37 @@ import {
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8082';
 
+const CLE_JETON = 'rgaa_jwt';
+let jeton: string | null = localStorage.getItem(CLE_JETON);
+
+export function getJeton(): string | null {
+  return jeton;
+}
+
+export function setJeton(valeur: string | null): void {
+  jeton = valeur;
+  if (valeur) {
+    localStorage.setItem(CLE_JETON, valeur);
+  } else {
+    localStorage.removeItem(CLE_JETON);
+  }
+}
+
+export async function connexion(email: string, motDePasse: string): Promise<void> {
+  const reponse = await fetch(`${BASE}/api/login_check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ email, motDePasse }),
+  });
+
+  if (!reponse.ok) {
+    throw new Error('Identifiants invalides.');
+  }
+
+  const data = (await reponse.json()) as { token: string };
+  setJeton(data.token);
+}
+
 export type Page = { id: string; url: string; titre: string };
 
 export type Projet = {
@@ -69,8 +100,17 @@ export type Taux = {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE}${path}`, {
     ...init,
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...(jeton ? { Authorization: `Bearer ${jeton}` } : {}),
+      ...(init?.headers ?? {}),
+    },
   });
+
+  if (401 === response.status) {
+    setJeton(null);
+  }
 
   if (!response.ok) {
     throw new Error(`Requête ${path} : HTTP ${response.status}`);
