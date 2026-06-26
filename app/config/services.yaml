@@ -14,6 +14,11 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    # Tous les moteurs d'audit (RGAA, complexité…) sont collectés par le registre.
+    _instanceof:
+        App\Domain\Audit\Port\MoteurAudit:
+            tags: ['app.moteur_audit']
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -47,6 +52,11 @@ services:
 
     App\Domain\Shared\Port\IdGenerator:
         '@App\Infrastructure\Shared\Adapter\UuidV7Generator'
+
+    # Registre des moteurs d'audit (aiguillage par référentiel).
+    App\Application\Audit\Service\RegistreMoteurs:
+        arguments:
+            $moteurs: !tagged_iterator app.moteur_audit
 
     App\Domain\Scan\Port\ScanRepository:
         '@App\Infrastructure\Scan\Adapter\DoctrineScanRepository'

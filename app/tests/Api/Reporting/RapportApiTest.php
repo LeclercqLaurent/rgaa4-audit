@@ -52,7 +52,7 @@ final class RapportApiTest extends ApiSecuriseeTestCase
             'json' => ['nom' => 'Projet complexité', 'client' => 'Interne', 'type' => 'complexite_php', 'cible' => '/opt/phpx/src'],
         ])->toArray();
         $projetId = is_string($data['id']) ? $data['id'] : '';
-        $client->request('POST', '/api/projets/'.$projetId.'/analyse', ['json' => (object) []]);
+        $client->request('POST', '/api/projets/'.$projetId.'/auditer', ['json' => (object) []]);
 
         $reponse = $client->request('GET', '/api/projets/'.$projetId.'/rapport');
 

@@ -302,19 +302,17 @@ export function useSupprimerPage(projetId: string) {
   });
 }
 
-export function useLancerScan(projetId: string) {
+/**
+ * Point d'entrée unifié : déclenche l'audit selon le type du projet. RGAA →
+ * scan asynchrone (synchrone:false) ; Complexité → constats produits
+ * (synchrone:true, constatsGeneres). Invalide scans + constats + taux.
+ */
+export function useLancerAudit(projetId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: () => request<Scan>(`/api/projets/${projetId}/scans`, { method: 'POST', body: '{}' }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['scans', projetId] }),
-  });
-}
-
-export function useAnalyserComplexite(projetId: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: () => request<{ traites: number }>(`/api/projets/${projetId}/analyse`, { method: 'POST', body: '{}' }),
+    mutationFn: () => request<{ synchrone: boolean; constatsGeneres: number | null }>(`/api/projets/${projetId}/auditer`, { method: 'POST', body: '{}' }),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['scans', projetId] });
       qc.invalidateQueries({ queryKey: ['constats', projetId] });
       qc.invalidateQueries({ queryKey: ['taux', projetId] });
     },

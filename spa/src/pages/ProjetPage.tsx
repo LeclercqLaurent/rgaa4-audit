@@ -9,11 +9,10 @@ import {
   Statut,
   ouvrirRapport,
   useAjouterPage,
-  useAnalyserComplexite,
   useConsommerScans,
   useConstats,
   useDefinirStatut,
-  useLancerScan,
+  useLancerAudit,
   useModifierPage,
   useProjet,
   useScans,
@@ -97,9 +96,8 @@ export default function ProjetPage() {
 
 function Entete({ projet }: { projet: Projet }) {
   const { data: scans } = useScans(projet.id);
-  const lancer = useLancerScan(projet.id);
+  const auditer = useLancerAudit(projet.id);
   const consommer = useConsommerScans(projet.id);
-  const analyser = useAnalyserComplexite(projet.id);
   const estRgaa = 'rgaa' === projet.type;
   const dernier = scans?.[0];
 
@@ -135,7 +133,7 @@ function Entete({ projet }: { projet: Projet }) {
           <div className="actions">
             {estRgaa ? (
               <>
-                <button className="btn" type="button" onClick={() => lancer.mutate()} disabled={lancer.isPending}>
+                <button className="btn" type="button" onClick={() => auditer.mutate()} disabled={auditer.isPending}>
                   <Play size={16} aria-hidden="true" /> Lancer un scan
                 </button>
                 <button className="btn btn-secondary" type="button" onClick={() => consommer.mutate()} disabled={consommer.isPending}>
@@ -144,9 +142,9 @@ function Entete({ projet }: { projet: Projet }) {
                 </button>
               </>
             ) : (
-              <button className="btn" type="button" onClick={() => analyser.mutate()} disabled={analyser.isPending}>
-                <RefreshCw size={16} aria-hidden="true" className={analyser.isPending ? 'animate-spin' : ''} />
-                {analyser.isPending ? 'Analyse…' : 'Analyser le code'}
+              <button className="btn" type="button" onClick={() => auditer.mutate()} disabled={auditer.isPending}>
+                <RefreshCw size={16} aria-hidden="true" className={auditer.isPending ? 'animate-spin' : ''} />
+                {auditer.isPending ? 'Analyse…' : 'Analyser le code'}
               </button>
             )}
           </div>
@@ -166,9 +164,9 @@ function Entete({ projet }: { projet: Projet }) {
           {consommer.data.traites} message(s) traité(s).
         </p>
       )}
-      {!estRgaa && analyser.isSuccess && (
+      {!estRgaa && auditer.isSuccess && (
         <p className="mt-3 text-sm text-gray-600" aria-live="polite">
-          {analyser.data.traites} constat(s) de complexité générés.
+          {auditer.data.constatsGeneres} constat(s) de complexité générés.
         </p>
       )}
       {estRgaa && dernier?.erreur && (
