@@ -99,6 +99,12 @@ jobs:
       - name: Générer la paire de clés JWT
         run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
 
+      # Doctrine suffixe la base par _test dans cet environnement : c'est elle
+      # qu'il faut créer, pas celle que le service MariaDB provisionne au
+      # démarrage. La commande la nomme à notre place.
+      - name: Créer la base de test
+        run: php bin/console doctrine:database:create --if-not-exists
+
       - name: Construire le schéma par les migrations
         run: php bin/console doctrine:migrations:migrate --no-interaction
 
