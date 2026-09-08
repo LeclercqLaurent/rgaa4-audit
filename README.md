@@ -220,11 +220,10 @@ docker compose exec www php bin/console doctrine:migrations:migrate
 docker compose exec www php bin/console app:referential:load
 docker compose exec www php bin/console app:mapping:load
 
-# Authentification : clés JWT, passphrase au vault, puis un compte.
-docker compose exec www php bin/console lexik:jwt:generate-keypair
-docker compose exec www php bin/console secrets:generate-keys
-docker compose exec www php bin/console secrets:set JWT_PASSPHRASE
-docker compose exec www php bin/console app:utilisateur:creer
+# Les secrets d'authentification : voir la section ci-dessous, l'ordre compte.
+
+# Un compte pour se connecter.
+docker compose exec www php bin/console app:utilisateur:creer <email> <motDePasse>
 ```
 
 | Service | Accès |
@@ -233,6 +232,57 @@ docker compose exec www php bin/console app:utilisateur:creer
 | Documentation de l'API | http://api.rgaa.local:8081/api/docs |
 | SPA (Vite) | http://localhost:5173 |
 | Mailpit | http://localhost:8026 |
+
+### Les secrets, à générer après le clone
+
+Aucun secret n'est versionné : ni le vault Symfony (`app/config/secrets/`), ni la
+paire de clés JWT (`app/config/jwt/*.pem`). Un clone frais n'en a donc aucun, et
+c'est voulu. Il faut les produire une fois, dans cet ordre :
+
+```bash
+# 1. La paire de clés du vault de dev, propre à ce poste.
+docker compose exec www php bin/console secrets:generate-keys
+
+# 2. La passphrase qui protégera la clé privée JWT (saisie interactive).
+docker compose exec www php bin/console secrets:set JWT_PASSPHRASE
+
+# 3. La paire de clés JWT, chiffrée avec cette passphrase.
+docker compose exec www php bin/console lexik:jwt:generate-keypair
+
+# 4. Le vault de l'environnement de test, avec LA MÊME passphrase qu'en dev.
+docker compose exec www php bin/console secrets:generate-keys --env=test
+docker compose exec www php bin/console secrets:set JWT_PASSPHRASE --env=test
+
+# Contrôle
+docker compose exec www php bin/console lexik:jwt:check-config
+```
+
+**L'ordre n'est pas cosmétique** : `lexik:jwt:generate-keypair` lit
+`JWT_PASSPHRASE` pour chiffrer la clé privée qu'il produit. Lancé en premier, il
+échoue.
+
+**Et la passphrase doit être identique en dev et en test.** Les deux
+environnements ont chacun leur vault, mais pointent sur la **même** paire de
+clés `config/jwt/*.pem` : deux valeurs différentes rendent la clé privée
+illisible côté test, et toute la suite de tests d'API tombe. C'est aussi
+pourquoi `secrets:set --random`, pratique ailleurs, ne convient pas ici : il
+tirerait une valeur différente par environnement.
+
+**Le symptôme, si l'étape a été oubliée**, est le même sur n'importe quelle
+commande ou requête :
+
+```
+Environment variable not found: "JWT_PASSPHRASE".
+```
+
+**Sans vault, c'est possible aussi** : une vraie variable d'environnement prime
+sur le vault côté Symfony. Définir `JWT_PASSPHRASE` dans l'environnement suffit,
+et c'est ce que fait la CI, qui n'a pas de vault à déchiffrer. Le vault n'a
+d'intérêt que pour garder la valeur d'un poste à l'autre sans la mettre en clair.
+
+Ces fichiers ne doivent jamais revenir dans le dépôt : la clé
+`*.decrypt.private.php` ouvre le vault, et `.gitignore` couvre déjà les deux
+emplacements.
 
 Auditer un projet sans passer par l'interface :
 
