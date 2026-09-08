@@ -150,7 +150,7 @@ un troisième référentiel revient à écrire une classe, pas à toucher au res
 
 ## Ce que les tests prouvent
 
-**52 tests PHP, 115 assertions**, plus 5 tests de la SPA. Ils tournent en CI sur
+**58 tests PHP, 121 assertions**, plus 5 tests de la SPA. Ils tournent en CI sur
 une base MariaDB construite **par les migrations**, jamais par un dump.
 
 | Couche | Couverture de lignes | Sous plancher |
@@ -158,16 +158,16 @@ une base MariaDB construite **par les migrations**, jamais par un dump.
 | `Application` | 92,6 % | ✅ |
 | `Domain` | 90,6 % | ✅ |
 | `State` (providers API Platform) | 65,3 % | |
-| `Infrastructure` | 60,1 % | |
+| `Infrastructure` | 60,4 % | |
 | `ApiResource` (DTO) | 44,4 % | |
-| **Total `src/`** | **71,7 %** | |
+| **Total `src/`** | **71,8 %** | |
 
 Le plancher qui fait échouer le build porte sur le **métier** : Domain et
 Application réunis, à **91,9 %** pour un minimum de 90 %
 (`scripts/couverture.php`). Le reste est mesuré et affiché, jamais opposé à un
 seuil : un repository Doctrine se vérifie par un test d'API qui traverse la pile,
 pas en visant un pourcentage sur une classe de mapping. Le chiffre global,
-71,7 %, est donné tel quel plutôt que dissimulé derrière la seule ligne flatteuse.
+71,8 %, est donné tel quel plutôt que dissimulé derrière la seule ligne flatteuse.
 
 Ce que les tests vérifient concrètement :
 
@@ -246,6 +246,10 @@ Contrôles qualité :
 ./scripts/qa.sh                                        # PSR-12 + PHPStan 9
 docker compose exec www vendor/bin/phpunit             # tests PHP
 docker compose exec spa npm run test                   # tests SPA + axe
+
+# Couverture : pcov est dans l'image, désactivé par défaut.
+docker compose exec www php -d pcov.enabled=1 vendor/bin/phpunit --coverage-clover var/clover.xml
+php scripts/couverture.php app/var/clover.xml 90
 ```
 
 ---

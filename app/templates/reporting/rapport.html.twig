@@ -16,10 +16,25 @@
         .s-conforme { color: #18753c; font-weight: bold; }
         .s-non_conforme { color: #ce0500; font-weight: bold; }
         .s-non_applicable, .s-non_teste { color: #666; }
-        .preuve { font-family: monospace; font-size: 11px; color: #444; }
+        .preuve { font-size: 11px; color: #444; margin-bottom: 5px; }
+        .intitule { font-weight: normal; color: #444; }
+        .reste { font-size: 11px; font-style: italic; color: #666; margin: 4px 0 0; }
+
+        /* Les sélecteurs CSS relevés par axe-core sont longs et sans espace :
+           sans césure forcée, Dompdf les laisse déborder hors de la page. Une
+           largeur de colonne fixe empêche en plus la colonne des preuves de
+           manger tout le tableau. */
+        .plan { table-layout: fixed; }
+        .c-critere { width: 26%; }
+        .c-unite { width: 26%; }
+        .c-preuves { width: 48%; }
+        .plan code, .unite { font-family: monospace; font-size: 10px; color: #444; }
+        .plan td, .plan code, .unite { word-wrap: break-word; word-break: break-all; }
     </style>
 </head>
 <body>
+    {# Nombre d'occurrences montrees par critere dans le plan d'action. #}
+    {% set max_preuves = 5 %}
     {% set libelles = {'conforme': 'Conforme', 'non_conforme': 'Non conforme', 'non_applicable': 'Non applicable', 'non_teste': 'Non testé'} %}
     {% set global = rapport.taux.global %}
     {% set complexite = rapport.type == 'complexite_php' %}
@@ -76,7 +91,7 @@
             {% for ligne in section.lignes %}
             <tr>
                 <td>{{ ligne.critereNumero }}</td>
-                <td>{{ ligne.intitule }}</td>
+                <td>{{ ligne.intitule|sans_glossaire }}</td>
                 <td class="s-{{ ligne.statut.value }}">{{ libelles[ligne.statut.value] }}</td>
                 <td>{{ ligne.source.value }}</td>
             </tr>
@@ -92,20 +107,28 @@
     {% if plan is empty %}
     <p>Aucune non-conformité automatique relevée.</p>
     {% else %}
-    <table>
+    <table class="plan">
         <caption>Non-conformités à corriger</caption>
+        <colgroup><col class="c-critere"><col class="c-unite"><col class="c-preuves"></colgroup>
         <thead>
             <tr><th scope="col">Critère</th><th scope="col">Unité auditée</th><th scope="col">Preuves</th></tr>
         </thead>
         <tbody>
             {% for ligne in plan %}
             <tr>
-                <td>{{ ligne.critereNumero }}<br><span class="preuve">{{ ligne.intitule }}</span></td>
-                <td class="preuve">{{ ligne.uniteAuditee }}</td>
+                <td><strong>{{ ligne.critereNumero }}</strong><br><span class="intitule">{{ ligne.intitule|sans_glossaire }}</span></td>
+                <td class="unite">{{ ligne.uniteAuditee }}</td>
                 <td>
-                    {% for preuve in ligne.preuves %}
-                    <div class="preuve">{{ preuve.regle }}{% if preuve.cible %} — <code>{{ preuve.cible }}</code>{% endif %}</div>
+                    {# Une même règle axe peut relever des dizaines d'occurrences sur
+                       une page. Les lister toutes rend le plan d'action inutilisable :
+                       on montre de quoi identifier le problème, et on annonce le reste. #}
+                    {% for preuve in ligne.preuves|slice(0, max_preuves) %}
+                    <div class="preuve"><strong>{{ preuve.regle }}</strong>{% if preuve.cible %}<br><code>{{ preuve.cible }}</code>{% endif %}</div>
                     {% endfor %}
+                    {% set restantes = ligne.preuves|length - max_preuves %}
+                    {% if restantes > 0 %}
+                    <p class="reste">et {{ restantes }} autre{{ restantes > 1 ? 's' : '' }} occurrence{{ restantes > 1 ? 's' : '' }} de la même règle.</p>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
