@@ -32,7 +32,7 @@ final class AuditApiTest extends ApiSecuriseeTestCase
     public function testProjetComplexiteDeclencheUnAuditSynchrone(): void
     {
         $client = $this->clientAuthentifie();
-        $id = $this->creerProjet($client, 'complexite_php', '/opt/phpx/src');
+        $id = $this->creerProjet($client, 'complexite_php', $this->cibleComplexite());
 
         $reponse = $client->request('POST', '/api/projets/'.$id.'/auditer', ['json' => (object) []]);
 

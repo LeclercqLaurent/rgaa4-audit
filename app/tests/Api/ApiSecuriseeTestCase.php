@@ -39,6 +39,24 @@ abstract class ApiSecuriseeTestCase extends ApiTestCase
         return $client;
     }
 
+    /**
+     * Cible d'un projet « Complexité PHP » : le domaine du dépôt lui-même.
+     *
+     * Le code analysé doit exister partout où la suite tourne. Viser
+     * l'installation locale de l'outil d'analyse faisait dépendre les tests
+     * d'un montage propre à un poste, ce qui ne se voyait qu'ailleurs.
+     *
+     * Le domaine est choisi pour ses 78 méthodes : un dossier de Value Objects
+     * et d'interfaces n'en expose aucune, et l'analyse ne produirait rien à
+     * vérifier.
+     */
+    protected function cibleComplexite(): string
+    {
+        $racine = self::getContainer()->getParameter('kernel.project_dir');
+
+        return (is_string($racine) ? $racine : '').'/src/Domain';
+    }
+
     protected function garantirAuditeur(): void
     {
         $utilisateurs = self::getContainer()->get(UtilisateurRepository::class);

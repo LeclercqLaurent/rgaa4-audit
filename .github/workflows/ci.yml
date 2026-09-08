@@ -79,6 +79,8 @@ jobs:
       # Le vault de secrets n'est pas versionné : en CI la passphrase est une
       # variable d'environnement, qui prime sur le vault côté Symfony.
       JWT_PASSPHRASE: ci
+      # Chemin de l'outil récupéré ci-dessous, en absolu depuis la racine du run.
+      COMPLEXITY_COMMAND: '["php","${{ github.workspace }}/outils/phpx-complexity/bin/phpx-complexity"]'
 
     steps:
       - uses: actions/checkout@v4
@@ -95,6 +97,20 @@ jobs:
         uses: ramsey/composer-install@v3
         with:
           working-directory: app
+
+      # Le second moteur d'audit est un outil externe. Le récupérer ici teste la
+      # frontière pour de vrai, plutôt que de neutraliser les tests qui la
+      # traversent.
+      - name: Récupérer phpx-complexity, second moteur d'audit
+        uses: actions/checkout@v4
+        with:
+          repository: LeclercqLaurent/phpx-complexity
+          path: outils/phpx-complexity
+
+      - name: Installer les dépendances de phpx-complexity
+        uses: ramsey/composer-install@v3
+        with:
+          working-directory: outils/phpx-complexity
 
       - name: Générer la paire de clés JWT
         run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
