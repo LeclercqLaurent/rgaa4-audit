@@ -43,9 +43,12 @@ Ce dépôt relie les deux bouts.
                                                               (HTML et PDF)
 ```
 
-Ce qu'aucun scan ne couvre reste **« non évalué »**, et l'outil ne confond jamais
-« non évalué » avec « non conforme » : c'est la différence entre un taux honnête
-et un taux flatteur.
+Le taux se calcule sur les **constats existants** : un critère sur lequel
+personne ne s'est prononcé, ni la machine ni l'auditeur, ne pèse pas dans le
+résultat. Tant que la saisie manuelle n'a pas eu lieu, un taux issu du seul scan
+ne porte donc que sur les critères qu'axe-core sait regarder, et le rapport le
+dit en toutes lettres. Voir [les limites](#ce-que-ce-nest-pas) : c'est le point
+le plus important à comprendre avant de lire un chiffre produit ici.
 
 ---
 
@@ -256,9 +259,18 @@ Le périmètre s'arrête à ce qui rend l'architecture démontrable de bout en b
 **Ce n'est pas un audit RGAA automatique.** Aucun outil ne l'est, et prétendre le
 contraire est la faute la plus répandue du secteur. Une part importante des
 critères demande un jugement humain : pertinence d'une alternative textuelle,
-cohérence d'un titrage, utilisabilité réelle au clavier. Le scan pré-remplit ce
-qu'une machine peut trancher, et laisse le reste **explicitement non évalué**.
-Le rapport produit ici ne vaut pas déclaration de conformité.
+cohérence d'un titrage, utilisabilité réelle au clavier. Le scan ne fait que
+pré-remplir ce qu'une machine peut trancher. Le rapport produit ici ne vaut pas
+déclaration de conformité.
+
+**Le taux issu d'un scan seul est trompeur, et c'est une limite connue.** Sur une
+exécution réelle contre un site statique, axe-core se prononce sur **60 des 106
+critères** ; les 46 autres ne reçoivent aucun constat, donc n'entrent ni au
+numérateur ni au dénominateur. Le rapport annonce alors « 100 % » avec la mention
+« au regard des critères automatiquement évalués », et compte « 0 non testé »
+là où 46 critères n'ont pas été regardés. Le chiffre n'est honnête qu'une fois la
+saisie manuelle faite. Générer un constat **non évalué** pour tout critère sans
+verdict, afin qu'il apparaisse au dénominateur, est le prochain correctif prévu.
 
 ---
 
