@@ -8,7 +8,7 @@ hexagonale, un scanner **axe-core** piloté depuis l'outil, et la traduction
 [![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![Symfony](https://img.shields.io/badge/Symfony-8.1-000000?logo=symfony&logoColor=white)](https://symfony.com/)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%209-2A9D8F)](https://phpstan.org/)
-[![Couverture métier](https://img.shields.io/badge/couverture%20m%C3%A9tier-91.2%25-brightgreen)](#ce-que-les-tests-prouvent)
+[![Couverture métier](https://img.shields.io/badge/couverture%20m%C3%A9tier-94.2%25-brightgreen)](#ce-que-les-tests-prouvent)
 [![Licence](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
 [![Données](https://img.shields.io/badge/donn%C3%A9es-Licence%20Ouverte%202.0-blue)](LICENCE-DONNEES.txt)
 
@@ -151,23 +151,24 @@ un troisième référentiel revient à écrire une classe, pas à toucher au res
 ## Ce que les tests prouvent
 
 **63 tests PHP, 130 assertions**, plus 5 tests de la SPA. Ils tournent en CI sur
-une base MariaDB construite **par les migrations**, jamais par un dump.
+une base MariaDB construite **par les migrations**, jamais par un dump, et les
+chiffres ci-dessous sont ceux que la CI publie à chaque exécution.
 
 | Couche | Couverture de lignes | Sous plancher |
 |---|---:|:---:|
-| `Application` | 91,2 % | ✅ |
-| `Domain` | 91,3 % | ✅ |
-| `State` (providers API Platform) | 65,3 % | |
-| `Infrastructure` | 60,4 % | |
-| `ApiResource` (DTO) | 44,4 % | |
-| **Total `src/`** | **72,0 %** | |
+| `Application` | 94,3 % | ✅ |
+| `Domain` | 94,0 % | ✅ |
+| `State` (providers API Platform) | 83,2 % | |
+| `Infrastructure` | 65,9 % | |
+| `ApiResource` (DTO) | 88,9 % | |
+| **Total `src/`** | **77,9 %** | |
 
 Le plancher qui fait échouer le build porte sur le **métier** : Domain et
-Application réunis, à **91,2 %** pour un minimum de 90 %
+Application réunis, à **94,2 %** pour un minimum de 90 %
 (`scripts/couverture.php`). Le reste est mesuré et affiché, jamais opposé à un
 seuil : un repository Doctrine se vérifie par un test d'API qui traverse la pile,
 pas en visant un pourcentage sur une classe de mapping. Le chiffre global,
-72,0 %, est donné tel quel plutôt que dissimulé derrière la seule ligne flatteuse.
+77,9 %, est donné tel quel plutôt que dissimulé derrière la seule ligne flatteuse.
 
 Ce que les tests vérifient concrètement :
 
@@ -283,6 +284,12 @@ d'intérêt que pour garder la valeur d'un poste à l'autre sans la mettre en cl
 Ces fichiers ne doivent jamais revenir dans le dépôt : la clé
 `*.decrypt.private.php` ouvre le vault, et `.gitignore` couvre déjà les deux
 emplacements.
+
+Le **second moteur d'audit** est un outil externe,
+[`phpx-complexity`](https://github.com/LeclercqLaurent/phpx-complexity). Les
+projets de type « Complexité PHP » en ont besoin : cloner l'outil, puis faire
+pointer `COMPLEXITY_COMMAND` sur son exécutable (voir `app/.env`). Les projets
+RGAA n'en dépendent pas.
 
 Auditer un projet sans passer par l'interface :
 
