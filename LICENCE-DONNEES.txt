@@ -1,0 +1,42 @@
+LICENCE DES DONNÉES : sources/ et app/fixtures/rgaa/
+====================================================
+
+La licence MIT du fichier LICENSE couvre le CODE de ce dépôt : l'application
+Symfony, la SPA React, le service de scan Node et leurs tests.
+
+Elle ne couvre PAS le contenu du RGAA, qui a son propre régime.
+
+Source
+------
+Le kit d'audit officiel (grille .ods, modèle de rapport, exemple de déclaration)
+et le fichier « criteres.json » sont publiés par la DINUM :
+
+    https://accessibilite.numerique.gouv.fr/ressources/kit-audit/
+    https://github.com/DISIC/accessibilite.numerique.gouv.fr
+
+Ce dépôt officiel déclare : « Le code source de ce dépôt est publié sous licence
+MIT. Sauf mention de propriété intellectuelle détenue par des tiers, les contenus
+de ce dépôt sont publiés sous licence Ouverte 2.0. »
+
+Le référentiel RGAA est un contenu : il relève donc de la LICENCE OUVERTE 2.0
+(Etalab).
+
+    https://www.etalab.gouv.fr/licence-ouverte-open-licence/
+
+Périmètre concerné
+------------------
+    sources/rgaa4.1.2.modele-de-grille-d-audit.ods
+    sources/rgaa4-2019-modele-rapport-audit.{odt,pdf}
+    sources/rgaa4-2019-exemple-declaration.{odt,pdf}
+    sources/rgaa-criteres-tests.json
+    app/fixtures/rgaa/criteres.yaml
+    app/fixtures/rgaa/mapping-rgaa-wcag.yaml
+    app/fixtures/rgaa/mapping-wcag-rgaa.yaml
+
+Version reprise ici
+-------------------
+    Référentiel   : RGAA 4.1.2
+    Récupéré le   : 2026-06-23
+
+La Licence Ouverte 2.0 impose la mention de la paternité : la source et sa date
+de récupération sont indiquées ci-dessus et dans sources/README.md.

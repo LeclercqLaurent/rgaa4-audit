@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    name: QA : PSR-12 et PHPStan 9
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_mysql, zip
+          coverage: none
+          tools: none
+
+      - name: Installer les dépendances
+        uses: ramsey/composer-install@v3
+        with:
+          working-directory: app
+
+      - name: PHP-CS-Fixer (PSR-12, strict_types)
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php
+
+      # PHPStan analyse le conteneur Symfony : il lui faut le cache réchauffé.
+      - name: Réchauffer le cache Symfony
+        run: php bin/console cache:warmup --env=dev
+        env:
+          APP_ENV: dev
+          DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/rgaa?serverVersion=11.4.0-MariaDB&charset=utf8mb4'
+          JWT_PASSPHRASE: ci
+
+      - name: PHPStan (level 9, + règles Sonar S107 et S1142)
+        run: vendor/bin/phpstan analyse --configuration=phpstan.dist.neon --no-progress
+
+  tests:
+    name: Tests PHP et plancher de couverture
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    services:
+      db:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: rgaa_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+
+    env:
+      APP_ENV: test
+      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/rgaa_test?serverVersion=11.4.0-MariaDB&charset=utf8mb4'
+      JWT_SECRET_KEY: '%kernel.project_dir%/config/jwt/private.pem'
+      JWT_PUBLIC_KEY: '%kernel.project_dir%/config/jwt/public.pem'
+      # Le vault de secrets n'est pas versionné : en CI la passphrase est une
+      # variable d'environnement, qui prime sur le vault côté Symfony.
+      JWT_PASSPHRASE: ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_mysql, zip
+          coverage: pcov
+          tools: none
+
+      - name: Installer les dépendances
+        uses: ramsey/composer-install@v3
+        with:
+          working-directory: app
+
+      - name: Générer la paire de clés JWT
+        run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
+
+      - name: Construire le schéma par les migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+
+      # Le référentiel officiel est une donnée d'entrée du domaine : si son
+      # chargement casse, les tests d'audit n'ont plus de sens.
+      - name: Charger le référentiel RGAA et le mapping axe-core
+        run: |
+          php bin/console app:referential:load
+          php bin/console app:mapping:load
+
+      - name: PHPUnit
+        run: php -d pcov.enabled=1 vendor/bin/phpunit --coverage-clover var/clover.xml
+
+      - name: Plancher de couverture (métier à 90 %)
+        run: php ../scripts/couverture.php var/clover.xml 90
+
+  spa:
+    name: SPA : typage, tests et accessibilité
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: spa
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: spa/package-lock.json
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: TypeScript (--noEmit)
+        run: npm run typecheck
+
+      # Les tests montent les écrans par rôle accessible et les passent à axe :
+      # une régression RGAA échoue ici, pas en recette.
+      - name: Vitest (React Testing Library + axe)
+        run: npm run test

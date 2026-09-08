@@ -6,9 +6,12 @@ services:
     container_name: www_rgaa
     volumes:
       - ./app:/var/www/app
+      # Scripts de la racine : montés pour que la QA locale voie exactement les
+      # mêmes fichiers que la CI (cf. app/.php-cs-fixer.dist.php).
+      - ./scripts:/var/www/scripts:ro
       - ./build/vhosts:/etc/apache2/sites-enabled:ro
     ports:
-      - "8081:80"   # 8080 réservé par un autre projet (Bien-Esti) ; cf. CLAUDE.md
+      - "8081:80"
     depends_on:
       - db
       - mail
@@ -22,7 +25,7 @@ services:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: rgaa_dev
     ports:
-      - "3309:3306"   # 3308 réservé par un autre projet
+      - "3309:3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./build/mariadb/conf.d:/etc/mysql/conf.d:ro
@@ -33,15 +36,14 @@ services:
     image: axllent/mailpit:latest
     container_name: mail_rgaa
     ports:
-      - "1026:1025"   # 1025 réservé par un autre projet
-      - "8026:8025"   # 8025 réservé par un autre projet
+      - "1026:1025"   # SMTP
+      - "8026:8025"   # interface web
     networks:
       - rgaa
 
-  # Service de scan a11y (Puppeteer + axe-core). Node 24 en conteneur dédié.
-  # L'interface (CLI invoqué par Symfony Process vs microservice HTTP) reste à
-  # trancher — voir CLAUDE.md « Décisions ouvertes ». La command sera définie une
-  # fois le code du scanner écrit ; pour l'instant le conteneur reste disponible.
+  # Service de scan a11y (Puppeteer + axe-core), Node 24 en conteneur dédié.
+  # Symfony l'invoque en ligne de commande (cf. SCANNER_COMMAND dans app/.env) :
+  # la frontière PHP ↔ Node est un contrat « URL en entrée, JSON axe en sortie ».
   scanner:
     build:
       context: .

@@ -27,3 +27,4 @@ docker-compose.override.yaml
 # de déchiffrement ne sont versionnées. En local : `bin/console secrets:generate-keys`
 # puis `secrets:set JWT_PASSPHRASE`. En CI : variable d'environnement JWT_PASSPHRASE.
 /app/config/secrets/
+

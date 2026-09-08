@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-// Coding standards du socle : PSR-12 + declare(strict_types) + ligne vide en fin
-// de fichier + imports triés. Voir CLAUDE.md (socle « Coding Standards »).
+// Coding standards : PSR-12 + declare(strict_types) + ligne vide en fin de
+// fichier + imports triés. Le dossier scripts/ de la racine est inclus pour
+// qu'aucun fichier PHP du dépôt ne reste hors du filet.
 
 $dirs = array_filter(
-    [__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/tools'],
+    [__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/tools', __DIR__ . '/../scripts'],
     'is_dir',
 );
 
