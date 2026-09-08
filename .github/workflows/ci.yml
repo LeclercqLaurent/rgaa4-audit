@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   qa:
-    name: QA : PSR-12 et PHPStan 9
+    name: "QA : PSR-12 et PHPStan 9"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -110,7 +110,7 @@ jobs:
         run: php ../scripts/couverture.php var/clover.xml 90
 
   spa:
-    name: SPA : typage, tests et accessibilité
+    name: "SPA : typage, tests et accessibilité"
     runs-on: ubuntu-latest
     defaults:
       run:
