@@ -17,6 +17,13 @@ jobs:
       run:
         working-directory: app
 
+    # composer install exécute les auto-scripts, dont cache:clear : la
+    # configuration est résolue dès l'installation, passphrase comprise.
+    env:
+      APP_ENV: dev
+      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/rgaa?serverVersion=11.4.0-MariaDB&charset=utf8mb4'
+      JWT_PASSPHRASE: ci
+
     steps:
       - uses: actions/checkout@v4
 
@@ -39,10 +46,6 @@ jobs:
       # PHPStan analyse le conteneur Symfony : il lui faut le cache réchauffé.
       - name: Réchauffer le cache Symfony
         run: php bin/console cache:warmup --env=dev
-        env:
-          APP_ENV: dev
-          DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/rgaa?serverVersion=11.4.0-MariaDB&charset=utf8mb4'
-          JWT_PASSPHRASE: ci
 
       - name: PHPStan (level 9, + règles Sonar S107 et S1142)
         run: vendor/bin/phpstan analyse --configuration=phpstan.dist.neon --no-progress
@@ -59,7 +62,10 @@ jobs:
         image: mariadb:11.4
         env:
           MARIADB_ROOT_PASSWORD: root
-          MARIADB_DATABASE: rgaa_test
+          MARIADB_DATABASE: rgaa
+          # Doctrine ajoute le suffixe _test en environnement de test :
+          # la base visée par les tests est rgaa_test, donc le service doit
+          # exposer rgaa.
         ports: ['3306:3306']
         options: >-
           --health-cmd="healthcheck.sh --connect --innodb_initialized"
@@ -67,7 +73,7 @@ jobs:
 
     env:
       APP_ENV: test
-      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/rgaa_test?serverVersion=11.4.0-MariaDB&charset=utf8mb4'
+      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/rgaa?serverVersion=11.4.0-MariaDB&charset=utf8mb4'
       JWT_SECRET_KEY: '%kernel.project_dir%/config/jwt/private.pem'
       JWT_PUBLIC_KEY: '%kernel.project_dir%/config/jwt/public.pem'
       # Le vault de secrets n'est pas versionné : en CI la passphrase est une
