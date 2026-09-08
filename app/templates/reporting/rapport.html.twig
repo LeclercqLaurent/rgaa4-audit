@@ -53,13 +53,25 @@
     </table>
 
     <h2>{% if complexite %}Synthèse{% else %}Déclaration d'accessibilité{% endif %}</h2>
+    {% set incomplet = rapport.taux.nonTestes > 0 %}
     <p>
-        Au regard des critères automatiquement évalués, {{ sujet }} est
-        {% if global is null %}<strong>non évalué</strong> (aucun critère évaluable automatiquement)
-        {% elseif global >= 1 %}<strong>totalement conforme</strong>
+        {% if global is null %}
+        Aucun critère n'a été évalué : {{ sujet }} est <strong>non évalué</strong>.
+        {% elseif incomplet %}
+        {# Le RGAA ne permet de déclarer une conformité qu'une fois tous les critères
+           applicables évalués. Tant qu'il en reste, le taux ne porte que sur une
+           partie du référentiel et ne vaut pas déclaration. #}
+        <strong>La conformité ne peut pas être déclarée</strong> :
+        {{ rapport.taux.nonTestes }} critère(s) n'ont reçu aucun constat. Le taux
+        ci-dessous ne porte que sur les critères effectivement évalués et ne
+        constitue pas une déclaration de conformité{% if not complexite %} au RGAA 4{% endif %}.
+        {% else %}
+        {{ sujet|capitalize }} est
+        {% if global >= 1 %}<strong>totalement conforme</strong>
         {% elseif global > 0 %}<strong>partiellement conforme</strong>
         {% else %}<strong>non conforme</strong>{% endif %}
         {% if complexite %}aux seuils de complexité.{% else %}au RGAA 4.{% endif %}
+        {% endif %}
     </p>
     <p class="taux">Taux de conformité : {% if global is null %}Non évalué{% else %}{{ (global * 100)|round(1) }} %{% endif %}</p>
     <p>

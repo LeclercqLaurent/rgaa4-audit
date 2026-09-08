@@ -8,6 +8,7 @@ use App\Application\Audit\Query\ListerConstats;
 use App\Application\Audit\Query\ListerConstatsHandler;
 use App\Application\Audit\Query\ObtenirProjet;
 use App\Application\Audit\Query\ObtenirProjetHandler;
+use App\Application\Audit\Service\CriteresAttendus;
 use App\Application\Referential\Query\ListerThematiques;
 use App\Application\Referential\Query\ListerThematiquesHandler;
 use App\Domain\Audit\Entity\Constat;
@@ -46,6 +47,7 @@ final readonly class ObtenirRapportHandler
         private ListerThematiquesHandler $listerThematiques,
         private ResolveurConstatsEffectifs $resolveur,
         private CalculateurTaux $calculateur,
+        private CriteresAttendus $criteresAttendus,
     ) {
     }
 
@@ -58,7 +60,7 @@ final readonly class ObtenirRapportHandler
         }
 
         $effectifs = $this->resolveur->resoudre(($this->listerConstats)(new ListerConstats($query->projetId)));
-        $taux = $this->calculateur->calculer($effectifs);
+        $taux = $this->calculateur->calculer($effectifs, $this->criteresAttendus->pour($projet->type()));
         $thematiques = ($this->listerThematiques)(new ListerThematiques());
 
         return new Rapport(
@@ -134,7 +136,9 @@ final readonly class ObtenirRapportHandler
                 static fn (Constat $c): LigneRapport => new LigneRapport($c->critereNumero(), $label, $c->uniteAuditee(), $c->statut(), $c->source(), $c->preuves()),
                 $constats,
             );
-            $sections[] = new SectionThematique($numero++, $label, $lignes, $this->calculateur->calculer($constats)->global);
+            // Les lentilles de complexité n'ont pas de liste fermée de critères :
+            // rien n'y manque par construction, donc aucun critère attendu à opposer.
+            $sections[] = new SectionThematique($numero++, $label, $lignes, $this->calculateur->calculer($constats, [])->global);
         }
 
         return $sections;

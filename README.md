@@ -8,7 +8,7 @@ hexagonale, un scanner **axe-core** piloté depuis l'outil, et la traduction
 [![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![Symfony](https://img.shields.io/badge/Symfony-8.1-000000?logo=symfony&logoColor=white)](https://symfony.com/)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%209-2A9D8F)](https://phpstan.org/)
-[![Couverture métier](https://img.shields.io/badge/couverture%20m%C3%A9tier-91.9%25-brightgreen)](#ce-que-les-tests-prouvent)
+[![Couverture métier](https://img.shields.io/badge/couverture%20m%C3%A9tier-91.2%25-brightgreen)](#ce-que-les-tests-prouvent)
 [![Licence](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
 [![Données](https://img.shields.io/badge/donn%C3%A9es-Licence%20Ouverte%202.0-blue)](LICENCE-DONNEES.txt)
 
@@ -43,12 +43,12 @@ Ce dépôt relie les deux bouts.
                                                               (HTML et PDF)
 ```
 
-Le taux se calcule sur les **constats existants** : un critère sur lequel
-personne ne s'est prononcé, ni la machine ni l'auditeur, ne pèse pas dans le
-résultat. Tant que la saisie manuelle n'a pas eu lieu, un taux issu du seul scan
-ne porte donc que sur les critères qu'axe-core sait regarder, et le rapport le
-dit en toutes lettres. Voir [les limites](#ce-que-ce-nest-pas) : c'est le point
-le plus important à comprendre avant de lire un chiffre produit ici.
+**Ce qu'aucun constat ne couvre est compté comme non évalué**, et non passé
+sous silence. Le calcul reçoit la liste des critères que le référentiel impose
+de regarder : tout critère sans verdict, sur chaque page de l'échantillon,
+apparaît au décompte. Tant qu'il en reste, le rapport refuse de prononcer une
+conformité, comme l'exige le RGAA. C'est le point le plus important à
+comprendre avant de lire un chiffre produit ici.
 
 ---
 
@@ -150,30 +150,30 @@ un troisième référentiel revient à écrire une classe, pas à toucher au res
 
 ## Ce que les tests prouvent
 
-**58 tests PHP, 121 assertions**, plus 5 tests de la SPA. Ils tournent en CI sur
+**63 tests PHP, 130 assertions**, plus 5 tests de la SPA. Ils tournent en CI sur
 une base MariaDB construite **par les migrations**, jamais par un dump.
 
 | Couche | Couverture de lignes | Sous plancher |
 |---|---:|:---:|
-| `Application` | 92,6 % | ✅ |
-| `Domain` | 90,6 % | ✅ |
+| `Application` | 91,2 % | ✅ |
+| `Domain` | 91,3 % | ✅ |
 | `State` (providers API Platform) | 65,3 % | |
 | `Infrastructure` | 60,4 % | |
 | `ApiResource` (DTO) | 44,4 % | |
-| **Total `src/`** | **71,8 %** | |
+| **Total `src/`** | **72,0 %** | |
 
 Le plancher qui fait échouer le build porte sur le **métier** : Domain et
-Application réunis, à **91,9 %** pour un minimum de 90 %
+Application réunis, à **91,2 %** pour un minimum de 90 %
 (`scripts/couverture.php`). Le reste est mesuré et affiché, jamais opposé à un
 seuil : un repository Doctrine se vérifie par un test d'API qui traverse la pile,
 pas en visant un pourcentage sur une classe de mapping. Le chiffre global,
-71,8 %, est donné tel quel plutôt que dissimulé derrière la seule ligne flatteuse.
+72,0 %, est donné tel quel plutôt que dissimulé derrière la seule ligne flatteuse.
 
 Ce que les tests vérifient concrètement :
 
 - les **invariants du Domain** : une URL invalide est refusée à la construction,
-  un taux de conformité distingue « non évalué » de 0 %, un scan ne change d'état
-  que dans le sens permis ;
+  un critère sans constat est compté non évalué page par page sans peser sur le
+  taux, un scan ne change d'état que dans le sens permis ;
 - l'**API de bout en bout**, par contexte : création de projet, échantillon de
   pages, planification de scan, constats, taux, rapport ;
 - les **frontières de l'API** : 401 sans jeton et sur mauvais mot de passe, 404
@@ -317,14 +317,16 @@ cohérence d'un titrage, utilisabilité réelle au clavier. Le scan ne fait que
 pré-remplir ce qu'une machine peut trancher. Le rapport produit ici ne vaut pas
 déclaration de conformité.
 
-**Le taux issu d'un scan seul est trompeur, et c'est une limite connue.** Sur une
-exécution réelle contre un site statique, axe-core se prononce sur **60 des 106
-critères** ; les 46 autres ne reçoivent aucun constat, donc n'entrent ni au
-numérateur ni au dénominateur. Le rapport annonce alors « 100 % » avec la mention
-« au regard des critères automatiquement évalués », et compte « 0 non testé »
-là où 46 critères n'ont pas été regardés. Le chiffre n'est honnête qu'une fois la
-saisie manuelle faite. Générer un constat **non évalué** pour tout critère sans
-verdict, afin qu'il apparaisse au dénominateur, est le prochain correctif prévu.
+**Un scan seul ne suffit pas à prononcer une conformité, et l'outil le dit.**
+Sur une exécution réelle contre un site statique, axe-core se prononce sur
+**60 des 106 critères** ; les 46 autres restent à la charge de l'auditeur. Ils
+sont comptés comme non évalués, et tant qu'il en reste le rapport affiche « la
+conformité ne peut pas être déclarée » à la place de la déclaration.
+
+Le taux, lui, garde la définition officielle du RGAA, conformes sur conformes
+plus non conformes : les non évalués n'y entrent pas. Un projet peut donc
+afficher 100 % **et** 92 critères non évalués, ce qui se lit exactement comme il
+faut : parfait sur ce qui a été regardé, et loin d'être terminé.
 
 ---
 
