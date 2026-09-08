@@ -18,3 +18,12 @@ docker-compose.override.yaml
 /spa/node_modules/
 /spa/dist/
 /spa/.env.local
+
+# Specs Gherkin locales (non trackées, cf. socle)
+/app/tests/features/**/*.feature
+/app/tests/features/*.feature
+
+# Vault de secrets Symfony : ni les valeurs chiffrées, ni surtout la clé privée
+# de déchiffrement ne sont versionnées. En local : `bin/console secrets:generate-keys`
+# puis `secrets:set JWT_PASSPHRASE`. En CI : variable d'environnement JWT_PASSPHRASE.
+/app/config/secrets/
