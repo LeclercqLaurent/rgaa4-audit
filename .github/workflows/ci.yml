@@ -23,9 +23,16 @@ jobs:
       APP_ENV: dev
       DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/rgaa?serverVersion=11.4.0-MariaDB&charset=utf8mb4'
       JWT_PASSPHRASE: ci
+      APP_SECRET: ci
 
     steps:
       - uses: actions/checkout@v4
+
+      # Gate autoritaire : le hook pre-commit est local et contournable,
+      # la CI est le filet qui empêche un secret d'atteindre le dépôt public.
+      - name: Détection de secrets versionnés
+        run: ./scripts/scan-secrets.sh --tracked
+        working-directory: .
 
       - name: Installer PHP
         uses: shivammathur/setup-php@v2
@@ -79,6 +86,7 @@ jobs:
       # Le vault de secrets n'est pas versionné : en CI la passphrase est une
       # variable d'environnement, qui prime sur le vault côté Symfony.
       JWT_PASSPHRASE: ci
+      APP_SECRET: ci
       # Chemin de l'outil récupéré ci-dessous, en absolu depuis la racine du run.
       COMPLEXITY_COMMAND: '["php","${{ github.workspace }}/outils/phpx-complexity/bin/phpx-complexity"]'
 

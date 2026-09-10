@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 #
 # Garde-fou QA local (socle) — à lancer avant chaque commit.
-# Exécute PHP-CS-Fixer (vérification) + PHPStan level 9 dans le conteneur www.
+# Exécute la détection de secrets, puis PHP-CS-Fixer (vérification) + PHPStan
+# level 9 dans le conteneur www.
 # Code de sortie non nul = à corriger avant de committer.
 #
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 EXEC=(docker compose exec -T www)
+
+echo "▶ Détection de secrets versionnés…"
+./scripts/scan-secrets.sh --tracked
 
 echo "▶ PHP-CS-Fixer (vérification, sans modification)…"
 "${EXEC[@]}" vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php
